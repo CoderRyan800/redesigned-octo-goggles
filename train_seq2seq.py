@@ -55,12 +55,12 @@ import pickle
 
 batch_size = 64  # Batch size for training.
 epochs = 1  # Number of epochs to train for.
-latent_dim = 512  # Latent dimensionality of the encoding space.
+latent_dim = 256  # Latent dimensionality of the encoding space.
 num_samples = 50000  # Number of samples to train on.
 # Path to the data txt file on disk.  Changed from original (commented out) code.
 #data_path = 'fra-eng/fra.txt'
 #data_path = 'fra.txt'
-data_path = 'logic_data_extended.tsv'
+data_path = 'logic_data.tsv'
 # Vectorize the data.
 input_texts = []
 target_texts = []
@@ -74,7 +74,7 @@ for line in lines[: min(num_samples, len(lines) - 1)]:
     line_array = line.split('\t')
     # By using line_array[0] as opposed to original line_array[1], we are now
     # allowing repetitions and random ordering, which is very important.
-    input_text = line_array[0]
+    input_text = line_array[1]
     target_text = line_array[3]
     if line_index < 20:
         print("input_text=%s\ntarget_text=%s\n" % (input_text, target_text))
@@ -171,13 +171,17 @@ model = Model([encoder_inputs, decoder_inputs], decoder_outputs)
 # Run training
 model.compile(optimizer='rmsprop', loss='categorical_crossentropy',
               metrics=['accuracy'])
-model.fit([encoder_input_data, decoder_input_data], decoder_target_data,
+history = model.fit([encoder_input_data, decoder_input_data], decoder_target_data,
           batch_size=batch_size,
           epochs=epochs,
           validation_split=0.2)
 # Save model
 model.save('s2s.h5')
 model.save_weights('s2s_weights.h5')
+
+fp = open('training_history.pickle','wb')
+pickle.dump(history, fp)
+fp.close()
 # Next: inference mode (sampling).
 # Here's the drill:
 # 1) encode input and retrieve initial decoder state
