@@ -73,7 +73,7 @@ for line in lines[: min(num_samples, len(lines) - 1)]:
     line_array = line.split('\t')
     # By using line_array[0] as opposed to original line_array[1], we are now
     # allowing repetitions and random ordering, which is very important.
-    input_text = line_array[1]
+    input_text = line_array[0]
     target_text = line_array[3]
     if line_index < 20:
         print("input_text=%s\ntarget_text=%s\n" % (input_text, target_text))
