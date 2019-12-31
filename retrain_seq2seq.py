@@ -52,9 +52,9 @@ from keras.layers import Input, LSTM, Dense, Bidirectional
 from keras.layers.merge import Concatenate
 import numpy as np
 
-def retrain_network(data_set_filename)
+def retrain_network(data_set_filename):
     batch_size = 512  # Batch size for training.
-    epochs = 256  # Number of epochs to train for.
+    epochs = 1  # Number of epochs to train for.
     latent_dim = 256  # Latent dimensionality of the encoding space.
     num_samples = 50000  # Number of samples to train on.
     # Path to the data txt file on disk.  Changed from original (commented out) code.
@@ -267,12 +267,23 @@ list_of_training_files = [
 'logic_data_extended_16.tsv',
 'logic_data_extended_17.tsv',
 'logic_data_extended_18.tsv',
-'logic_data_extended_19.tsv',
+'logic_data_extended_19.tsv'
 ]
-
+list_of_training_files = [
+        'logic_data_extended_00.tsv',
+        'logic_data_extended_01.tsv',
+        'logic_data_extended_02.tsv',
+        'logic_data_extended_03.tsv',
+        'logic_data_extended_04.tsv',
+        'logic_data_extended_05.tsv',
+        'logic_data_extended_06.tsv',
+        'logic_data_extended_07.tsv',
+        'logic_data_extended_08.tsv',
+        'logic_data_extended_09.tsv'
+        ]
 num_training_sets = len(list_of_training_files)
 
-epochs = 1024
+epochs = 128
 
 fp = open('training_log.txt','w')
 
@@ -288,7 +299,7 @@ for current_epoch in range(epochs):
 
     history = retrain_network(filename)
 
-    loss_history = history['loss']
+    loss_history = history.history['loss']
 
     fp.write("Loss history:\n%s\n" % (str(loss_history),))
 
