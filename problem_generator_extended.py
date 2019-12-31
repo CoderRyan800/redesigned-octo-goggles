@@ -747,76 +747,109 @@ def basic_template_list():
 
 #### MAIN CODE BELOW FOR GENERTING PROBLEM SETS
 
+def make_problem_tsv_file(filename):
 
-long_template_dictionary = basic_template_list()
+    long_template_dictionary = basic_template_list()
 
-result_list = []
+    result_list = []
 
-num_problems = 50000
+    num_problems = 50000
 
-percentage_targets = {
-    'True' : 25.0,
-    'False' : 25.0,
-    'Unknown' : 25.0,
-    'Contradictory' : 25.0
-}
+    percentage_targets = {
+        'True' : 25.0,
+        'False' : 25.0,
+        'Unknown' : 25.0,
+        'Contradictory' : 25.0
+    }
 
-problem_index = 0
+    problem_index = 0
 
-for problem_index in range(num_problems):
+    for problem_index in range(num_problems):
 
-    # Randomly select a number.
+        # Randomly select a number.
 
-    random_number = np.random.rand()
-    # Decide on answer target.
-    if random_number < 0.400:
-        answer_target = 'True'
-    elif random_number < 0.800:
-        answer_target = 'False'
-    elif random_number < 0.900:
-        answer_target = 'Unknown'
-    else:
-        answer_target = 'Contradictory'
+        random_number = np.random.rand()
+        # Decide on answer target.
+        if random_number < 0.400:
+            answer_target = 'True'
+        elif random_number < 0.800:
+            answer_target = 'False'
+        elif random_number < 0.900:
+            answer_target = 'Unknown'
+        else:
+            answer_target = 'Contradictory'
 
-    problem_answer = None
-    # Select another random number to decide on template complexity.
-    random_number = np.random.rand()
+        problem_answer = None
+        # Select another random number to decide on template complexity.
+        random_number = np.random.rand()
 
-    if random_number < 0.250:
-        long_template_list = long_template_dictionary['template_list_0']
-    elif random_number < 0.500:
-        long_template_list = long_template_dictionary['template_list_1']
-    elif random_number < 0.750:
-        long_template_list = long_template_dictionary['template_list_2']
-    else:
-        long_template_list = long_template_dictionary['template_list_3']
+        if random_number < 0.250:
+            long_template_list = long_template_dictionary['template_list_0']
+        elif random_number < 0.500:
+            long_template_list = long_template_dictionary['template_list_1']
+        elif random_number < 0.750:
+            long_template_list = long_template_dictionary['template_list_2']
+        else:
+            long_template_list = long_template_dictionary['template_list_3']
 
-    num_templates = len(long_template_list)
+        num_templates = len(long_template_list)
 
-    attempt_index = 0
-    while ((problem_answer is None or problem_answer != answer_target) and
-        attempt_index < 50):
-        random_choice = np.random.randint(num_templates)
-        current_template = long_template_list[random_choice]
-        problem_instance = generate_problem_from_template(current_template)
-        problem_answer = problem_instance['answer']
-        attempt_index = attempt_index + 1
-    # End loop to keep selecting randomly until we get what we need.
+        attempt_index = 0
+        while ((problem_answer is None or problem_answer != answer_target) and
+            attempt_index < 50):
+            random_choice = np.random.randint(num_templates)
+            current_template = long_template_list[random_choice]
+            problem_instance = generate_problem_from_template(current_template)
+            problem_answer = problem_instance['answer']
+            attempt_index = attempt_index + 1
+        # End loop to keep selecting randomly until we get what we need.
 
-    result_list.append(current_template)
+        result_list.append(current_template)
 
-    if problem_index % 1000 == 0:
-        print("problem_index = %d" % (problem_index,))
+        if problem_index % 1000 == 0:
+            print("problem_index = %d" % (problem_index,))
 
-        print (current_template)
-        print (problem_instance)
-        print ("%s = %s" % (answer_target, problem_answer))
+            print (current_template)
+            print (problem_instance)
+            print ("%s = %s" % (answer_target, problem_answer))
 
-        print("\n\n")
+            print("\n\n")
 
-# Test in earnest - must be able to generator data!
+    # Test in earnest - must be able to generator data!
 
-long_template_list = basic_template_list()
+    long_template_list = basic_template_list()
 
-data_dictionary = template_list_to_training_data(template_list = result_list,
-                                                 filename = 'logic_data_extended.tsv')
+    data_dictionary = template_list_to_training_data(template_list = result_list,
+                                                     filename = filename)
+# End function make_problem_tsv_file
+
+list_of_files = [
+'logic_data_extended_00.tsv',
+'logic_data_extended_01.tsv',
+'logic_data_extended_02.tsv',
+'logic_data_extended_03.tsv',
+'logic_data_extended_04.tsv',
+'logic_data_extended_05.tsv',
+'logic_data_extended_06.tsv',
+'logic_data_extended_07.tsv',
+'logic_data_extended_08.tsv',
+'logic_data_extended_09.tsv',
+'logic_data_extended_10.tsv',
+'logic_data_extended_11.tsv',
+'logic_data_extended_12.tsv',
+'logic_data_extended_13.tsv',
+'logic_data_extended_14.tsv',
+'logic_data_extended_15.tsv',
+'logic_data_extended_16.tsv',
+'logic_data_extended_17.tsv',
+'logic_data_extended_18.tsv',
+'logic_data_extended_19.tsv',
+'logic_data_extended_20.tsv',
+'logic_data_extended_21.tsv',
+'logic_data_extended_22.tsv',
+'logic_data_extended_23.tsv',
+'logic_data_extended_24.tsv',
+]
+
+for filename in list_of_files:
+    make_problem_tsv_file(filename)
