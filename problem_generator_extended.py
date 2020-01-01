@@ -753,7 +753,7 @@ def make_problem_tsv_file(filename):
 
     result_list = []
 
-    num_problems = 50000
+    num_problems = 25000
 
     percentage_targets = {
         'True' : 25.0,
