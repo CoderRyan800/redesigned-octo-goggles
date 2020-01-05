@@ -850,6 +850,33 @@ list_of_files = [
 'logic_data_extended_23.tsv',
 'logic_data_extended_24.tsv',
 ]
+list_of_files = [
+'logic_data_extended_25.tsv',
+'logic_data_extended_26.tsv',
+'logic_data_extended_27.tsv',
+'logic_data_extended_28.tsv',
+'logic_data_extended_29.tsv',
+'logic_data_extended_30.tsv',
+'logic_data_extended_31.tsv',
+'logic_data_extended_32.tsv',
+'logic_data_extended_33.tsv',
+'logic_data_extended_34.tsv',
+'logic_data_extended_35.tsv',
+'logic_data_extended_36.tsv',
+'logic_data_extended_37.tsv',
+'logic_data_extended_38.tsv',
+'logic_data_extended_39.tsv',
+'logic_data_extended_40.tsv',
+'logic_data_extended_41.tsv',
+'logic_data_extended_42.tsv',
+'logic_data_extended_43.tsv',
+'logic_data_extended_44.tsv',
+'logic_data_extended_45.tsv',
+'logic_data_extended_46.tsv',
+'logic_data_extended_47.tsv',
+'logic_data_extended_48.tsv',
+'logic_data_extended_49.tsv',
+]
 
 for filename in list_of_files:
     make_problem_tsv_file(filename)
