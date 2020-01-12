@@ -880,7 +880,8 @@ def make_problem_tsv_file(filename):
 
 list_of_files = []
 
-for index in range(50,200):
+#for index in range(50,200):
+for index in range(200,500):
     list_of_files.append('logic_data_extended_%d.tsv' % (index,))
 
 for filename in list_of_files:
