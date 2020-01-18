@@ -308,7 +308,7 @@ list_of_training_files = [
 list_of_training_files = []
 
 for index in range(0,195):
-    list_of_training_files.append('logic_data_extended_%d.tsv' % (index,))
+    list_of_training_files.append('logic_data_extended_%02d.tsv' % (index,))
 
 
 num_training_sets = len(list_of_training_files)
