@@ -1,0 +1,13 @@
+1.  Create a text encoder that reads your one-hot pickle dictionary
+    and generates a one-hot encoded input of the proper dimensionality
+    for input to the function "decode_sequence".  Should be
+    (1,187,30).
+2.  Run tests of this against existing data.
+3.  Try creating your own cases.
+
+IMPORTANT: Users may tend to mess up input formatting.  Be sure
+that you use the "expr" capability from the textbook code to
+check expression validity and kick back an exception with a message
+if user input isn't valid.  But if it is valid then pass it in
+to the neural network.  Be sure maximum length isn't exceed.
+Remember, all kinds of people will run a web demo!
