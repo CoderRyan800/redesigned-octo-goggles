@@ -209,7 +209,7 @@ for seq_index in range(50000):
     if target_texts[seq_index].strip() != decoded_sentence.strip():
         error_count = error_count + 1
 
-    if seq_index % 1000 == 0:
+    if seq_index % 1000 == 0 or seq_index % 1000 == 1:
         print('-')
         print('Input sentence:', input_texts[seq_index])
         print('Target sentence:', target_texts[seq_index])
