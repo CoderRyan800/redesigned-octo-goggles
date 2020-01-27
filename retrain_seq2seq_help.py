@@ -46,17 +46,20 @@ models are more common in this domain.
     ](https://arxiv.org/abs/1406.1078)
 '''
 from __future__ import print_function
+import time
 import pickle
 from keras.models import Model, load_model
 from keras.layers import Input, LSTM, Dense, Bidirectional
 from keras.layers.merge import Concatenate
+from keras import backend as K
 import numpy as np
 
 def retrain_network(data_set_filename):
+    K.clear_session()
     batch_size = 512  # Batch size for training.
     epochs = 1  # Number of epochs to train for.
     latent_dim = 256  # Latent dimensionality of the encoding space.
-    num_samples = 50000  # Number of samples to train on.
+    num_samples = 25000  # Number of samples to train on.
     # Path to the data txt file on disk.  Changed from original (commented out) code.
     #data_path = 'fra-eng/fra.txt'
     #data_path = 'fra.txt'
@@ -91,6 +94,30 @@ def retrain_network(data_set_filename):
         for char in target_text:
             if char not in target_characters:
                 target_characters.add(char)
+        # Major addition: Replace the question with the word HELP
+        # and make the answer equal to the sentences without repetition.
+
+        input_array = input_text.split(" . ")
+        target_array = line_array[1].split(" . ")
+
+        input_text = input_array[0].strip() + " . " + "HELP"
+        target_text = target_array[0].strip()
+
+        if line_index < 20:
+            print("input_text=%s\ntarget_text=%s\n" % (input_text, target_text))
+        line_index = line_index+1
+        # We use "tab" as the "start sequence" character
+        # for the targets, and "\n" as "end sequence" character.
+        target_text = '\t' + target_text + '\n'
+        input_texts.append(input_text)
+        target_texts.append(target_text)
+        for char in input_text:
+            if char not in input_characters:
+                input_characters.add(char)
+        for char in target_text:
+            if char not in target_characters:
+                target_characters.add(char)
+    # End the loop
 
     input_characters = sorted(list(input_characters))
     target_characters = sorted(list(target_characters))
@@ -206,15 +233,15 @@ def retrain_network(data_set_filename):
     history = model.fit([encoder_input_data, decoder_input_data], decoder_target_data,
               batch_size=batch_size,
               epochs=epochs,
-              validation_split=0.2)
+              validation_split=0.05)
 
 
     # Save model
     model.save('s2s.h5')
     model.save_weights('s2s_weights.h5')
-    fp = open('training_history.pickle','wb')
-    pickle.dump(history, fp)
-    fp.close()
+    # fp = open('training_history.pickle','wb')
+    # pickle.dump(history, fp)
+    # fp.close()
 
     # Next: inference mode (sampling).
     # Here's the drill:
@@ -244,7 +271,9 @@ def retrain_network(data_set_filename):
     encoder_model.save('encoder_model.h5')
     decoder_model.save('decoder_model.h5')
 
-    return history
+    K.clear_session()
+
+    return history.history['loss']
 # End function retrain_network
 
 list_of_training_files = [
@@ -267,40 +296,45 @@ list_of_training_files = [
 'logic_data_extended_16.tsv',
 'logic_data_extended_17.tsv',
 'logic_data_extended_18.tsv',
-'logic_data_extended_19.tsv'
+'logic_data_extended_19.tsv',
+'logic_data_extended_20.tsv',
+'logic_data_extended_21.tsv',
+'logic_data_extended_22.tsv',
+'logic_data_extended_23.tsv',
+'logic_data_extended_24.tsv'
 ]
-list_of_training_files = [
-        'logic_data_extended_00.tsv',
-        'logic_data_extended_01.tsv',
-        'logic_data_extended_02.tsv',
-        'logic_data_extended_03.tsv',
-        'logic_data_extended_04.tsv',
-        'logic_data_extended_05.tsv',
-        'logic_data_extended_06.tsv',
-        'logic_data_extended_07.tsv',
-        'logic_data_extended_08.tsv',
-        'logic_data_extended_09.tsv'
-        ]
+
+
+list_of_training_files = []
+
+for index in range(0,195):
+    list_of_training_files.append('logic_data_extended_%02d.tsv' % (index,))
+
+
 num_training_sets = len(list_of_training_files)
 
-epochs = 128
+epochs = 2048
 
-fp = open('training_log.txt','w')
-
-for current_epoch in range(epochs):
-
+for current_epoch in range(1547,1548):
+    fp = open('training_log.txt','a')
     fp.write("STARTING EPOCH %d\n" % (current_epoch,))
-
+    fp.close()
     current_set = np.random.randint(num_training_sets)
-
+    fp = open('training_log.txt','a')
     fp.write("Using training set file %d\n" % (current_set,))
-
+    fp.close()
     filename = list_of_training_files[current_set]
-
-    history = retrain_network(filename)
-
-    loss_history = history.history['loss']
-
+    #time.sleep(30)
+    fp = open('training_log.txt','a')
+    fp.write("Start training\n")
+    fp.close()
+    loss_history = retrain_network(filename)
+    fp = open('training_log.txt','a')
+    fp.write("End training\n")
+    fp.close()
+    fp = open('training_log.txt','a')
     fp.write("Loss history:\n%s\n" % (str(loss_history),))
+    fp.write("End of epoch\n")
+    fp.close()
 
 # End epoch loop

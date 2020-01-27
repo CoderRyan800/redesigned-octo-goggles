@@ -56,7 +56,7 @@ import pickle
 batch_size = 64  # Batch size for training.
 epochs = 1  # Number of epochs to train for.
 latent_dim = 256  # Latent dimensionality of the encoding space.
-num_samples = 50000  # Number of samples to train on.
+num_samples = 25000  # Number of samples to train on.
 # Path to the data txt file on disk.  Changed from original (commented out) code.
 #data_path = 'fra-eng/fra.txt'
 #data_path = 'fra.txt'
@@ -90,6 +90,30 @@ for line in lines[: min(num_samples, len(lines) - 1)]:
     for char in target_text:
         if char not in target_characters:
             target_characters.add(char)
+    # Major addition: Replace the question with the word HELP
+    # and make the answer equal to the sentences without repetition.
+
+    input_array = input_text.split(" . ")
+    target_array = line_array[1].split(" . ")
+
+    input_text = input_array[0].strip() + " . " + "HELP"
+    target_text = target_array[0].strip()
+    
+    if line_index < 20:
+        print("input_text=%s\ntarget_text=%s\n" % (input_text, target_text))
+    line_index = line_index+1
+    # We use "tab" as the "start sequence" character
+    # for the targets, and "\n" as "end sequence" character.
+    target_text = '\t' + target_text + '\n'
+    input_texts.append(input_text)
+    target_texts.append(target_text)
+    for char in input_text:
+        if char not in input_characters:
+            input_characters.add(char)
+    for char in target_text:
+        if char not in target_characters:
+            target_characters.add(char)
+# End the loop
 
 input_characters = sorted(list(input_characters))
 target_characters = sorted(list(target_characters))
