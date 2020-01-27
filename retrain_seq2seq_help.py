@@ -315,7 +315,7 @@ num_training_sets = len(list_of_training_files)
 
 epochs = 2048
 
-for current_epoch in range(0,epochs):
+for current_epoch in range(1547,1548):
     fp = open('training_log.txt','a')
     fp.write("STARTING EPOCH %d\n" % (current_epoch,))
     fp.close()
