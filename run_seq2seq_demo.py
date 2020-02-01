@@ -228,23 +228,85 @@ def decode_sequence(input_seq):
 
     return decoded_sentence
 
+# error_count = 0
+# for seq_index in range(5000):
+#     # Take one sequence (part of the training set)
+#     # for trying out decoding.
+#     input_seq = encoder_input_data[seq_index: seq_index + 1]
+#     decoded_sentence = decode_sequence(input_seq)
+#     if target_texts[seq_index].strip() != decoded_sentence.strip():
+#         error_count = error_count + 1
+#
+#     if seq_index % 1000 == 0 or seq_index % 1000 == 1:
+#         print('-')
+#         print('Input sentence:', input_texts[seq_index])
+#         print('Target sentence:', target_texts[seq_index])
+#         print('Decoded sentence:', decoded_sentence)
+#         if target_texts[seq_index].strip() != decoded_sentence.strip():
+#
+#             print("WRONG")
+#         else:
+#             print("CORRECT")
+#         print("%d errors out of %d examples so far\n" % (error_count, seq_index+1))
+
+class nn_entity:
+
+    def __init__(self):
+
+        self.encoder_model = load_model('encoder_model.h5')
+        self.decoder_model = load_model('decoder_model.h5')
+
+        fp = open('input_token_index.pickle', 'rb')
+        self.input_token_index = pickle.load(fp)
+        fp.close()
+
+        fp = open('target_token_index.pickle', 'rb')
+        self.target_token_index = pickle.load(fp)
+        fp.close()
+
+    # End initializer
+
+    def run_network(self, input_sentence):
+
+        self.encoder_input_data = np.zeros(
+            (1, max_encoder_seq_length, num_encoder_tokens),
+            dtype='float32')
+        self.decoder_input_data = np.zeros(
+            (1, max_decoder_seq_length, num_decoder_tokens),
+            dtype='float32')
+        self.decoder_target_data = np.zeros(
+            (1, max_decoder_seq_length, num_decoder_tokens),
+            dtype='float32')
+
+        self.encoder_input_data[0, :, :] = encode_input_text(self.input_token_index, input_sentence)
+        decoded_sentence = decode_sequence(self.encoder_input_data)
+        return_sentence = decoded_sentence.strip()
+
+        return return_sentence
+
+    # End run_session
+
+# End class declaration for nn_entity
+
+# Test code for the entity below.
+
+test_obj = nn_entity()
+
+total_count = 0
 error_count = 0
-for seq_index in range(50000):
-    # Take one sequence (part of the training set)
-    # for trying out decoding.
-    input_seq = encoder_input_data[seq_index: seq_index + 1]
-    decoded_sentence = decode_sequence(input_seq)
-    if target_texts[seq_index].strip() != decoded_sentence.strip():
+
+for i, (input_text, target_text) in enumerate(zip(input_texts, target_texts)):
+
+    test_result = test_obj.run_network(input_text)
+
+    target = target_text.strip()
+    result = test_result.strip()
+
+    total_count = total_count + 1
+    if target != result:
         error_count = error_count + 1
 
-    if seq_index % 1000 == 0 or seq_index % 1000 == 1:
-        print('-')
-        print('Input sentence:', input_texts[seq_index])
-        print('Target sentence:', target_texts[seq_index])
-        print('Decoded sentence:', decoded_sentence)
-        if target_texts[seq_index].strip() != decoded_sentence.strip():
+    print("INPUT: %s\nTARGET: %s\nRESULT %s\n" % (input_text, target, result))
+    print("TOTAL: %d ERROR: %d\n\n" % (total_count, error_count))
 
-            print("WRONG")
-        else:
-            print("CORRECT")
-        print("%d errors out of %d examples so far\n" % (error_count, seq_index+1))
+# End test loop
