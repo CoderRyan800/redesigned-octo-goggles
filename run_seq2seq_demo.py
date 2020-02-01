@@ -1,5 +1,6 @@
 from __future__ import print_function
 import pickle
+import re
 from keras.models import Model, load_model
 from keras.layers import Input
 from keras.layers.merge import Concatenate
@@ -264,6 +265,8 @@ class nn_entity:
         self.target_token_index = pickle.load(fp)
         fp.close()
 
+        self.knowledge_sentences = []
+
     # End initializer
 
     def run_network(self, input_sentence):
@@ -284,7 +287,31 @@ class nn_entity:
 
         return return_sentence
 
-    # End run_session
+    # End run_network
+
+    def add_knowledge(self, knowledge_sentence):
+
+        self.knowledge_sentences.append(knowledge_sentence.strip())
+
+    # End add_knowledge
+
+    def ask_question(self, question):
+
+        query_string = ""
+
+        n_sentences = len(self.knowledge_sentences)
+
+        for index in range(n_sentences-1):
+
+            query_string = query_string + "%s & " % self.knowledge_sentences[index]
+
+        query_string = query_string + "%s . %s" % (self.knowledge_sentences[-1], question)
+
+        network_answer = self.run_network(query_string)
+
+        return network_answer
+
+    # End ask_question
 
 # End class declaration for nn_entity
 
@@ -294,8 +321,8 @@ test_obj = nn_entity()
 
 total_count = 0
 error_count = 0
-
-for i, (input_text, target_text) in enumerate(zip(input_texts, target_texts)):
+stop_count = 50
+for i, (input_text, target_text) in enumerate(zip(input_texts[:stop_count], target_texts[:stop_count])):
 
     test_result = test_obj.run_network(input_text)
 
@@ -310,3 +337,43 @@ for i, (input_text, target_text) in enumerate(zip(input_texts, target_texts)):
     print("TOTAL: %d ERROR: %d\n\n" % (total_count, error_count))
 
 # End test loop
+
+regex_help = re.compile('HELP')
+
+test_obj.add_knowledge('~A')
+
+test_obj_2 = nn_entity()
+
+test_obj_2.add_knowledge('(C ==> A)')
+
+the_question = 'What is C ?'
+
+print ("Asking agent 1 question %s\n" % (the_question,))
+
+result_1 = test_obj.ask_question(the_question).strip()
+
+if regex_help.search(result_1) is None:
+
+    print ("Agent 1 answer = %s\n" % (result_1,))
+
+else:
+
+    print("Agent 1 is asking for help.\n")
+
+    result_2 = test_obj_2.ask_question('HELP')
+
+    agent_2_knowledge_list = result_2.split('.')
+
+    print("Agent 2 has answered - adding knowledge to agent 1\n")
+
+    for sentence in agent_2_knowledge_list:
+        test_obj.add_knowledge(sentence.strip())
+        print("Telling Agent 1: %s\n" % (sentence,))
+
+    print("Asking agent 1 the same question again\n")
+
+    result3 = test_obj.ask_question(the_question).strip()
+
+    print("Agent 1 answer: %s\n" % (result3,))
+
+# End logic for handling possible help request
