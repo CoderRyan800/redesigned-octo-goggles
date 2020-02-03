@@ -350,89 +350,72 @@ class nn_entity:
     # End ask_question
 
 # End class declaration for nn_entity
-#
-# # Test code for the entity below.
-#
-# test_obj = nn_entity()
-#
-# total_count = 0
-# error_count = 0
-# stop_count = 50
-# for i, (input_text, target_text) in enumerate(zip(input_texts[:stop_count], target_texts[:stop_count])):
-#
-#     test_result = test_obj.run_network(input_text)
-#
-#     target = target_text.strip()
-#     result = test_result.strip()
-#
-#     total_count = total_count + 1
-#     if target != result:
-#         error_count = error_count + 1
-#
-#     print("INPUT: %s\nTARGET: %s\nRESULT %s\n" % (input_text, target, result))
-#     print("TOTAL: %d ERROR: %d\n\n" % (total_count, error_count))
-#
-# # End test loop
-#
-#
-# test_obj_2 = nn_entity()
-#
-# regex_help = re.compile('HELP')
-#
-# agent_1_initial_knowledge_list = ['~A']
-#
-# agent_2_initial_knowledge_list = ['C ==> A']
-#
-# agent_1_knowledge_list = check_expression_list(agent_1_initial_knowledge_list)
-#
-# agent_2_knowledge_list = check_expression_list(agent_2_initial_knowledge_list)
-#
-# for item in agent_1_knowledge_list:
-#     test_obj.add_knowledge(item)
-#
-# for item in agent_2_knowledge_list:
-#     test_obj_2.add_knowledge(item)
-#
-# the_question = 'What is C ?'
-#
-# print ("Agent 1 initial knowledge below:\n")
-#
-# for item in agent_1_knowledge_list:
-#     print("%s\n" % (item,))
-#
-# print ("\nAgent 2 initial knowledge below:\n")
-#
-# for item in agent_2_knowledge_list:
-#     print("%s\n" % (item,))
-#
-# print ("\nAsking agent 1 this question: '%s'\n" % (the_question,))
-#
-# result_1 = test_obj.ask_question(the_question).strip()
-#
-# print("Agent 1 response: %s\n" % (result_1,))
-#
-# if regex_help.search(result_1) is None:
-#
-#     print ("Agent 1 answer = %s\n" % (result_1,))
-#
-# else:
-#
-#     print("Agent 1 is asking for help.\n")
-#
-#     result_2 = test_obj_2.ask_question('HELP')
-#
-#     agent_2_knowledge_list = result_2.split('.')
-#
-#     print("Agent 2 has answered - adding knowledge to agent 1\n")
-#
-#     for sentence in agent_2_knowledge_list:
-#         test_obj.add_knowledge(sentence.strip())
-#         print("Telling Agent 1: %s\n" % (sentence,))
-#
-#     print("Asking agent 1 the same question again\n")
-#
-#     result3 = test_obj.ask_question(the_question).strip()
-#
-#     print("Agent 1 answer: %s\n" % (result3,))
-#
-# # End logic for handling possible help request
+
+def run_dual_agent_demo(agent_1_initial_knowledge_list = ['~A'],
+                        agent_2_initial_knowledge_list = ['C ==> A'],
+                        question_for_agent_1 = 'What is C ?'):
+
+  # Test code for the entity below.
+  # Agent 1 was called test_obj
+  test_obj = nn_entity()
+  # Agent 2 was called test_obj_2
+  test_obj_2 = nn_entity()
+
+  regex_help = re.compile('HELP')
+  # Code below checks to be sure expressions are valid expressions and not
+  # unusable nonsense.
+  agent_1_knowledge_list = check_expression_list(agent_1_initial_knowledge_list)
+
+  agent_2_knowledge_list = check_expression_list(agent_2_initial_knowledge_list)
+  # Add knowledge expressions to each agent's knowledge base
+  for item in agent_1_knowledge_list:
+      test_obj.add_knowledge(item)
+
+  for item in agent_2_knowledge_list:
+      test_obj_2.add_knowledge(item)
+  # Define the question we ask agent 1
+  the_question = question_for_agent_1
+  # Lines below are the interaction between the two agents
+  print ("Agent 1 initial knowledge below:\n")
+
+  for item in agent_1_knowledge_list:
+      print("%s\n" % (item,))
+
+  print ("\nAgent 2 initial knowledge below:\n")
+
+  for item in agent_2_knowledge_list:
+      print("%s\n" % (item,))
+
+  print ("\nAsking agent 1 this question: '%s'\n" % (the_question,))
+
+  result_1 = test_obj.ask_question(the_question).strip()
+
+  print("Agent 1 response: %s\n" % (result_1,))
+  # If agent 1 has to ask for help, then agent 2 will dump its knowledge base
+  # to aid agent 2.  Otherwise agent 1 just answers the question.
+  if regex_help.search(result_1) is None:
+
+      print ("Agent 1 answer = %s\n" % (result_1,))
+
+  else:
+
+      print("Agent 1 is asking for help.\n")
+
+      result_2 = test_obj_2.ask_question('HELP')
+
+      agent_2_knowledge_list = result_2.split('.')
+
+      print("Agent 2 has answered - adding knowledge to agent 1\n")
+
+      for sentence in agent_2_knowledge_list:
+          test_obj.add_knowledge(sentence.strip())
+          print("Telling Agent 1: %s\n" % (sentence,))
+
+      print("Asking agent 1 the same question again\n")
+
+      result3 = test_obj.ask_question(the_question).strip()
+
+      print("Agent 1 answer: %s\n" % (result3,))
+
+  # End logic for handling possible help request
+# End function run_dual_agent_demo
