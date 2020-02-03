@@ -5,6 +5,10 @@ from keras.models import Model, load_model
 from keras.layers import Input
 from keras.layers.merge import Concatenate
 import numpy as np
+import traceback
+from logic import *
+
+from utils import *
 
 
 batch_size = 64  # Batch size for training.
@@ -146,6 +150,38 @@ def load_token_indices(input_token_index_filename, target_token_index_filename):
     }
 
 # End load_token_indices
+
+def check_expression(input_string):
+
+    try:
+
+        input_expr = expr(input_string)
+        return str(input_expr)
+    except:
+        # Print the stack trace
+        print("Error: input %s is not a logical expression!\n" % (str(input_string),))
+        traceback.print_exc()
+        print("See stack trace above\n")
+        return None
+
+# End check_expression
+
+def check_expression_list(list_of_strings):
+    try:
+        new_list = []
+        for current_item in list_of_strings:
+            check_result = check_expression(current_item)
+            if check_result is not None:
+                new_list.append(check_expression(current_item))
+            else:
+                print("WARNING: Invalid item in list of expression strings - see stack trace!\n")
+        return new_list
+    except:
+        # Print stack trace
+        print("Error: One or more expressions cannot be processed or input is not a valid list of expression strings!\n")
+        traceback.print_exc()
+        return None
+# End check_expression_list
 
 # Next: inference mode (sampling).
 # Here's the drill:
@@ -338,19 +374,42 @@ for i, (input_text, target_text) in enumerate(zip(input_texts[:stop_count], targ
 
 # End test loop
 
-regex_help = re.compile('HELP')
-
-test_obj.add_knowledge('~A')
 
 test_obj_2 = nn_entity()
 
-test_obj_2.add_knowledge('(C ==> A)')
+regex_help = re.compile('HELP')
+
+agent_1_initial_knowledge_list = ['~A']
+
+agent_2_initial_knowledge_list = ['C ==> A']
+
+agent_1_knowledge_list = check_expression_list(agent_1_initial_knowledge_list)
+
+agent_2_knowledge_list = check_expression_list(agent_2_initial_knowledge_list)
+
+for item in agent_1_knowledge_list:
+    test_obj.add_knowledge(item)
+
+for item in agent_2_knowledge_list:
+    test_obj_2.add_knowledge(item)
 
 the_question = 'What is C ?'
 
-print ("Asking agent 1 question %s\n" % (the_question,))
+print ("Agent 1 initial knowledge below:\n")
+
+for item in agent_1_knowledge_list:
+    print("%s\n" % (item,))
+
+print ("\nAgent 2 initial knowledge below:\n")
+
+for item in agent_2_knowledge_list:
+    print("%s\n" % (item,))
+
+print ("\nAsking agent 1 this question: '%s'\n" % (the_question,))
 
 result_1 = test_obj.ask_question(the_question).strip()
+
+print("Agent 1 response: %s\n" % (result_1,))
 
 if regex_help.search(result_1) is None:
 
