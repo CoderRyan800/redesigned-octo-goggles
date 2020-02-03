@@ -57,8 +57,8 @@ for line in lines[: min(num_samples, len(lines) - 1)]:
     input_text = input_array[0].strip() + " . " + "HELP"
     target_text = target_array[0].strip()
 
-    if line_index < 20:
-        print("input_text=%s\ntarget_text=%s\n" % (input_text, target_text))
+    # if line_index < 20:
+    #     print("input_text=%s\ntarget_text=%s\n" % (input_text, target_text))
     line_index = line_index+1
     # We use "tab" as the "start sequence" character
     # for the targets, and "\n" as "end sequence" character.
@@ -80,11 +80,11 @@ num_decoder_tokens = len(target_characters)
 max_encoder_seq_length = max([len(txt) for txt in input_texts])
 max_decoder_seq_length = max([len(txt) for txt in target_texts])
 
-print('Number of samples:', len(input_texts))
-print('Number of unique input tokens:', num_encoder_tokens)
-print('Number of unique output tokens:', num_decoder_tokens)
-print('Max sequence length for inputs:', max_encoder_seq_length)
-print('Max sequence length for outputs:', max_decoder_seq_length)
+# print('Number of samples:', len(input_texts))
+# print('Number of unique input tokens:', num_encoder_tokens)
+# print('Number of unique output tokens:', num_decoder_tokens)
+# print('Max sequence length for inputs:', max_encoder_seq_length)
+# print('Max sequence length for outputs:', max_decoder_seq_length)
 
 # input_token_index = dict(
 #     [(char, i) for i, char in enumerate(input_characters)])
