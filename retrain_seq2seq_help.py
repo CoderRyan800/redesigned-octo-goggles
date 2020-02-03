@@ -307,15 +307,15 @@ list_of_training_files = [
 
 list_of_training_files = []
 
-for index in range(0,195):
+for index in range(0,400):
     list_of_training_files.append('logic_data_extended_%02d.tsv' % (index,))
 
 
 num_training_sets = len(list_of_training_files)
 
-epochs = 2048
+epochs = 3072
 
-for current_epoch in range(1547,1548):
+for current_epoch in range(1548,epochs):
     fp = open('training_log.txt','a')
     fp.write("STARTING EPOCH %d\n" % (current_epoch,))
     fp.close()
