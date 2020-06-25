@@ -1,0 +1,229 @@
+\documentclass{article}
+
+\title{Simple Reasoning and Knowledge States in a LSTM-Based Agent}
+
+\author{Ryan Mukai}
+
+\date{14 December 2018}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+
+This article focuses on the development of a simple form of self-awareness in an LSTM-based agent. We present an agent capable of displaying its knowledge state and of answering questions based on its state of knowledge. If an agent is unable to answer a question, it will indicate this and request assistance from another agent. The other agent, upon receiving such a request, provides data from its knowledge state to aid the requester in its goal of finding an answer. The goals of this work are:
+
+\begin{enumerate}
+	\item Having agents maintain a concept of a propositional sentence as a unit of thought.
+	\item Having agents possess a concept of their own knowledge in the sense of being able to dump their knowledge state on request.
+	\item Having agents possess a concept of their own knowledge in the sense of being aware of not being able to answer a question and asking for help.
+	\item Having agents take advantage of basic self-knowledge to cooperate in order to solve a simple problem.
+	\item Having agents be aware of contradictions in their knowledge. In propositional logic, a contradiction (i.e. False) can imply anything, and the agent should warn of a contradiction in its knowledge if it recognizes one.
+\end{enumerate}
+
+Hence, our definition of self-awareness is a very narrow one that focuses on giving agents the ability to know certain things about their own knowledge state, and it is clear that this is far narrower than anything approaching consciousness. The focus of this article is not on creating a general-purpose reasoning agent since existing literature already covers this in much depth. The focus is instead on having neural network-based agents base their actions on their own understanding of their state of knowledge and use that knowledge to cooperate to solve a problem.
+
+Much work has occurred the field of neural networks and symbolic reasoning.
+A good survey of the field, with numerous references to recent developments, is
+\cite{DBLP:journals/corr/abs-1711-03902}, which is also a nice introduction to
+the field.
+A good but older introduction to neural-symbolic learning is \cite{neural_symbolic_2002},
+and another overview of the field is in
+\cite{bica2015_integrated_neural_symbolic}.
+Reference
+\cite{neural_symbolic_2007} describes many approaches used in neuro-symbolic
+learning systems, including the SHRUTI spiking neural network
+\cite{shruti_2007}, the Core Method for learning first order logic programs
+\cite{core_method_2007}, topos theory for learning models of
+predicate logical theories \cite{topos_theory_2007}, modal and temporal
+reasoning with neural networks \cite{modal_temporal_2007}, and multi-valued
+logic and neural networks \cite{multi_valued_logic_2007}, and many other
+approaches have been described in the literature.  The use of LSTMs for
+neuro-symbolic tasks also has a precedent,
+and one example is \cite{captcha_2017}.
+In \cite{possible_worlds}, the authors introduce PossibleWorldNets
+capable of achieving very good performance on propositional logic problems.
+A very interesting example of symbolic mathematical processing 
+is \cite{microsoft_research_symbolic_math} in which a neural network
+was able to beat Mathematica on complex symbolic mathematical tasks.
+
+\section{The Problem Agents are Trained to Solve}
+
+Agents are trained to reason on sentences involving syllogisms and the logical not(~), and (\&), or (|), exclusive-or (^), implication (==>), and bidirectional implication (<==>) operators. Throughout this article propositions, which can be either True or False, are denoted by the capital letters A through J inclusive. We train agents to handle simple problems of the following forms.
+
+\begin{enumerate}
+	\item Given the status of a propositional variable A as true, false, or unknown, respond to a question about its value.
+	\item Given a simple sentence such as A => B and given A is true, answer that B is true if asked about B.
+	\item Given a simple sentence such as A => Band given B is false, answer that A is false if asked about A.
+	\item nGiven the value of a and no other information, if asked about B indicate B is unknown.
+	\item Given contradictory statements, warn that the knowledge base is contradictory.
+	\item In addition to sentences of the form A => B, we include sentences of the form (A | B), (A ^ B), and (A & B). We also use ~ to denote logical not.
+\end{enumerate}
+
+
+\section{The Agent}
+\label{the_agent}
+The core of the agent consists of an LSTM neural network created
+using Keras \cite{chollet2015keras}
+with Tensorflow \cite{tensorflow2015-whitepaper}
+as a backend.
+
+The network is a sequence-to-sequence network of the type that has been used for language translation, and the source code is based directly upon the sequence-to-sequence tutorial found at https://keras.io/examples/lstm_seq2seq/ although, instead of translating from English to French, we are using the sequence-to-sequence model to answer logical questions.
+
+The inputs are logic sentences represented with one-hot encoding. These may contain repeated sentences. We use an example to illustrate. Suppose the list of sentences below, one-hot encoded, is our input.
+
+\begin{enumerate}
+	\item A
+	\item A => B
+	\item A => B
+	\item A
+\end{enumerate}
+
+When presented with the above, the network is expected to be able to recall the sentences in the order they were presented, without any repetitions, as follows:
+
+\begin{enumerate}
+	\item A
+	\item A => B
+\end{enumerate}
+
+It is possible during the course of operations that some statements presented to the agent may contain one or more repetitions as shown above, and the agent is trained, upon receiving the query “HELP”, to respond by condensing the knowledge list into just two sentences as shown above. This serves two purposes:
+
+\begin{enumerate}
+	\item Agents presented with lots of potentially repeating information must have a concept of what a logical sentence is, with the ability to condense repeat occurrences and return exactly the sentences that belong to the knowledge base. This implies some knowledge of a sentence as a “unit” of reason.
+	\item When an agent is asked for help, it should be able to supply its knowledge base in response to such a query from another agent.
+\end{enumerate}
+
+If the word “HELP” appears, then the environment sets a help flag and send the question “HELP” to another agent. The other agent’s response, the dump of its knowledge base, is sent back to the first agent, and the first agent tries to answer the question again. If the word “HELP” does not appear, then the other agent is not queried for its knowledge since the first agent’s answer is sufficient.
+
+\subsection{Agent Cooperation: Example 1}
+\label{example_1}
+
+Suppose we have two agents, Agent 1 and Agent 2. Agent 1 is given the following knowledge:
+
+\begin{itemize}
+	\item A => B
+\end{itemize}
+
+Agent 2 is given the following knowledge:
+
+\begin{itemize}
+	\item A
+\end{itemize}
+
+If we ask Agent 1 “What is B ?”, the following will occur.
+
+\begin{enumerate}
+	\item Agent 1 indicates B is unknown and requests help.
+	\item The simulation environment, in response to seeing Agent 1 request help, sends a help query to Agent 2.
+	\item Agent 2 dumps its knowledge that A is true.
+	\item This knowledge is added to the knowledge base of Agent 1.
+	\item Agent 1 runs again and is able to finally conclude b is true.
+\end{enumerate}
+
+In this example, we note the following:
+
+\begin{enumerate}
+	\item Agent 1 lacks adequate information to determine B and indicates a lack of knowledge of B.
+	\item Agent 1 will, without knowledge of B, make a request for help.
+	\item Agent 2 responds to a help query by dumping its knowledge state.
+	\item This allows Agent 1 to find the answer.
+\end{enumerate}
+
+Agents only request help if they do not know the answer but will otherwise answer the question. This implies that an agent has some knowledge of its own knowledge state. If one knows the answer, one answers the question. If one does not know an answer, one indicates this is so and requests help. Hence,
+
+\begin{enumerate}
+	\item Agents have a concept of knowing whether or not they know an answer and requesting help when they do not.
+	\item Agents also have knowledge states that they can dump if they are asked for help.
+	\item Moreover, in terms of maintaining an internal knowledge state, an agent knows how to purge repeat sentences and understands, to some extent, the idea of a sentence as a unit of knowledge since it can repeat units of knowledge when asked.
+\end{enumerate}
+
+\subsection{A Second Example}
+\label{example_2}
+
+Agent 1 is given the following knowledge:
+
+\begin{itemize}
+	\item A => B
+\end{itemize}
+
+Agent 2 is given the following knowledge:
+
+\begin{itemize}
+	\item ~B
+\end{itemize}
+
+If we ask Agent 1 “What is A?”, the following will occur.
+
+\begin{enumerate}
+	\item Agent 1 indicates a is unknown and requests help.
+	\item The simulation environment, in response to seeing Agent 1 request help, sends a help query to Agent 2.
+	\item Agent 2 dumps its knowledge ~B.
+	\item This knowledge is added to the knowledge base of Agent 1.
+	\item Agent 1 runs again and is able to finally conclude A is false.
+\end{enumerate}
+
+\section{Key Results}
+
+The network was found to yield an error rate of slightly less than 1\% on the validation data set logic\_data\_extended\.tsv contained in the gzip tar archive at https://beta1-demo.s3.amazonaws.com/beta\_demo\_data\_files\.tgz, which we have made publicly available to facilitate peer review. In this tab-separated file, the columns are defined as follows:
+
+\begin{enumerate}
+	\item The first column, or column 0, contains a set of logical statements separated by the logical and (\&) operator. This is the input data to the network consisting of logical statements and a question about a variable.
+	\item The second column, or column 1, contains the same set condensed, without any repetitions. This is used as target data when the query “HELP” is presented, teaching the network how to create a condensed form of knowledge and teaching the network to recognize logical sentences as units.
+	\item The fourth column, or column 3, contains the answer to the question in column 0, which could be: True, False, Contradictory, or Unknown HELP!
+\end{enumerate}
+
+The network is trained to respond to the question with the answer from column 3 (fourth column). It is also trained to respond to the sentences, but with the question replaced by “HELP”, by yielding a condensed form of knowledge from column 1 (second column).
+
+\section{Some Limitations}
+
+In the present implementation, an agent is a Python object, and the agent’s knowledge base is still maintained as a Python list of sentences presented to a newly initialized LSTM on each call to the agent. Each run of the neural network involves presenting the sentences and the question (where “help” is one possible question) to the network and subsequently obtaining its output. Maintenance of LSTM state across calls could be used in future editions of the agent to eliminate the need for maintaining an object with a list of sentences. Hence, the “memory” of an agent is still a Python list, although a sequence-to-sequence network performs operations like distilling the list to the essentials or answering questions about the sentences in the list.
+Given that our focus is on agents having a (limited) understanding of their own knowledge state, which is a basic form of self-awareness, much less emphasis has been placed on attempting to achieve general propositional reasoning. An error rate of about 1\% has been achieved on validation data, but the agent may perform poorly if presented with very long chains of reasoning of more than three or four sentences or with combinations of sentences that differ too much from what was seen in training. Users are invited to view the training and validation sets in the Gzipped tar file at https://beta1-demo.s3.amazonaws.com/beta\_demo\_nn\_and\_dictionaries\.tgz to view the kinds of problems we trained the agent to solve.
+
+\section{Demo and Source Code}
+
+There is a demonstration of this system available for peer review. One may visit the Google CoLab notebook at https://colab.research.google.com/drive/1\_X9NGH3KzFmJYRYNxjOWGH1Iw3RqszJV#scrollTo=33JiNK3zRdYj in order to run the demo.
+In the demo, logical operators are represented as follows:
+
+\begin{enumerate}
+	\item Logical NOT: ~
+	\item Logical AND: \&
+	\item Logical OR: |
+	\item Logical XOR: \^
+	\item Implication: ==>
+	\item Reverse implication: <==
+	\item If and only if: <=>
+\end{enumerate}
+
+Each of the two agents is provided with a list of sentences, and each sentence may only contain one or two propositions. Run each cell to install the code and the data files in Part 1 of the notebook. In Part 2, look for the code cell with this code:
+run\_dual\_agent\_demo(agent\_1\_initial\_knowledge\_list = [‘~A’, ‘B ==> A’, ‘A \& D’],agent\_2\_initial\_knowledge\_list = [‘B ^ C’],question\_for\_agent\_1 = ‘What is C ?’)
+Feel free to experiment with different input sentences. Note that the code contains functions to check the syntax of the statements you provide.
+The source code is available at the above link and at https://github.com/CoderRyan800/redesigned-octo-goggles.git
+
+We would like to give credit to two important sources for a great deal of our source code:
+\begin{enumerate}
+	\item The Python repository for the well-known textbook Artificial Intelligence: A Modern Approach is located at https://github.com/aimacode/aima-python and we have borrowed propositional logic code from that repository in order to create training and validation data for our agents. We also use code from this repo to perform syntax checks on user inputs to the agents in our web demo.
+	\item The Keras documentation at https://keras.io/examples/lstm_seq2seq/ and at https://keras.io/examples/lstm_seq2seq_restore/ provides example code that demonstrates sequence-to-sequence models, and we have also utilized this in a somewhat modified form to create and to train our own networks.
+\end{enumerate}
+
+\section{Summary}
+
+A deep learning neural network using LSTM and Dense layers with the ability to perform a very limited symbolic propositional reasoning task has been created and demonstrated. Agents with the ability to answer a question if the answer is known and with the ability to recognize a lack of knowledge and ask for help have been built, and these agents can also respond to requests for help with a knowledge state dump. The concept of learning a knowledge state has been demonstrated in a simple case.
+
+This work is a starting point. Possible future directions include, but are not limited to:
+
+\begin{enumerate}
+	\item Adding a broader range of problems that can be solved, especially given that we do not solve long chains of propositional sentences.
+	\item Having agents dump knowledge more selectively rather than giving a full knowledge dump when asked for help.
+	\item Changing from the existing LSTM-based seq2seq architecture to the much newer Transformer based architecture, introduced in the paper Attention is All You Need \cite{attention_is_all_you_need} and described very nicely in the superb article The Illustrated Transformer \cite{transformer}.
+\end{enumerate}
+
+\section{Acknowledgements}
+
+The author gratefully acknowledges the valuable feedback and advice received from Zaid Towfic, who pointed out several deficiencies in the first publication of this article.
+
+\bibliographystyle{plain}
+
+\bibliography{biblio_v2}
+
+\end{document}
