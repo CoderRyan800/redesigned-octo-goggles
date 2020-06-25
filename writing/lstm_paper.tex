@@ -4,7 +4,7 @@
 
 \author{Ryan Mukai}
 
-\date{14 December 2018}
+\date{\today}
 
 \begin{document}
 
@@ -50,15 +50,15 @@ was able to beat Mathematica on complex symbolic mathematical tasks.
 
 \section{The Problem Agents are Trained to Solve}
 
-Agents are trained to reason on sentences involving syllogisms and the logical not(~), and (\&), or (|), exclusive-or (^), implication (==>), and bidirectional implication (<==>) operators. Throughout this article propositions, which can be either True or False, are denoted by the capital letters A through J inclusive. We train agents to handle simple problems of the following forms.
+Agents are trained to reason on sentences involving syllogisms and the logical not(\textasciitilde), and (\&), or (|), exclusive-or (\textasciicircum), implication (==\textgreater), and bidirectional implication (\textless==\textgreater) operators. Throughout this article propositions, which can be either True or False, are denoted by the capital letters A through J inclusive. We train agents to handle simple problems of the following forms.
 
 \begin{enumerate}
 	\item Given the status of a propositional variable A as true, false, or unknown, respond to a question about its value.
-	\item Given a simple sentence such as A => B and given A is true, answer that B is true if asked about B.
-	\item Given a simple sentence such as A => Band given B is false, answer that A is false if asked about A.
+	\item Given a simple sentence such as A =\textgreater B and given A is true, answer that B is true if asked about B.
+	\item Given a simple sentence such as A =\textgreater Band given B is false, answer that A is false if asked about A.
 	\item nGiven the value of a and no other information, if asked about B indicate B is unknown.
 	\item Given contradictory statements, warn that the knowledge base is contradictory.
-	\item In addition to sentences of the form A => B, we include sentences of the form (A | B), (A ^ B), and (A & B). We also use ~ to denote logical not.
+	\item In addition to sentences of the form A =\textgreater B, we include sentences of the form (A | B), (A \textasciicircum B), and (A \& B). We also use \textasciitilde to denote logical not.
 \end{enumerate}
 
 
@@ -69,14 +69,14 @@ using Keras \cite{chollet2015keras}
 with Tensorflow \cite{tensorflow2015-whitepaper}
 as a backend.
 
-The network is a sequence-to-sequence network of the type that has been used for language translation, and the source code is based directly upon the sequence-to-sequence tutorial found at https://keras.io/examples/lstm_seq2seq/ although, instead of translating from English to French, we are using the sequence-to-sequence model to answer logical questions.
+The network is a sequence-to-sequence network of the type that has been used for language translation, and the source code is based directly upon the sequence-to-sequence tutorial found at https://keras.io/examples/lstm\_seq2seq/ although, instead of translating from English to French, we are using the sequence-to-sequence model to answer logical questions.
 
 The inputs are logic sentences represented with one-hot encoding. These may contain repeated sentences. We use an example to illustrate. Suppose the list of sentences below, one-hot encoded, is our input.
 
 \begin{enumerate}
 	\item A
-	\item A => B
-	\item A => B
+	\item A =\textgreater B
+	\item A =\textgreater B
 	\item A
 \end{enumerate}
 
@@ -84,7 +84,7 @@ When presented with the above, the network is expected to be able to recall the 
 
 \begin{enumerate}
 	\item A
-	\item A => B
+	\item A =\textgreater B
 \end{enumerate}
 
 It is possible during the course of operations that some statements presented to the agent may contain one or more repetitions as shown above, and the agent is trained, upon receiving the query “HELP”, to respond by condensing the knowledge list into just two sentences as shown above. This serves two purposes:
@@ -102,7 +102,7 @@ If the word “HELP” appears, then the environment sets a help flag and send t
 Suppose we have two agents, Agent 1 and Agent 2. Agent 1 is given the following knowledge:
 
 \begin{itemize}
-	\item A => B
+	\item A =\textgreater B
 \end{itemize}
 
 Agent 2 is given the following knowledge:
@@ -144,13 +144,13 @@ Agents only request help if they do not know the answer but will otherwise answe
 Agent 1 is given the following knowledge:
 
 \begin{itemize}
-	\item A => B
+	\item A =\textgreater B
 \end{itemize}
 
 Agent 2 is given the following knowledge:
 
 \begin{itemize}
-	\item ~B
+	\item \textasciitilde B
 \end{itemize}
 
 If we ask Agent 1 “What is A?”, the following will occur.
@@ -158,7 +158,7 @@ If we ask Agent 1 “What is A?”, the following will occur.
 \begin{enumerate}
 	\item Agent 1 indicates a is unknown and requests help.
 	\item The simulation environment, in response to seeing Agent 1 request help, sends a help query to Agent 2.
-	\item Agent 2 dumps its knowledge ~B.
+	\item Agent 2 dumps its knowledge \textasciitilde B.
 	\item This knowledge is added to the knowledge base of Agent 1.
 	\item Agent 1 runs again and is able to finally conclude A is false.
 \end{enumerate}
@@ -182,28 +182,28 @@ Given that our focus is on agents having a (limited) understanding of their own 
 
 \section{Demo and Source Code}
 
-There is a demonstration of this system available for peer review. One may visit the Google CoLab notebook at https://colab.research.google.com/drive/1\_X9NGH3KzFmJYRYNxjOWGH1Iw3RqszJV#scrollTo=33JiNK3zRdYj in order to run the demo.
+There is a demonstration of this system available for peer review. One may visit the Google CoLab notebook at https://colab.research.google.com/drive/1\_X9NGH3KzFmJYRYNxjOWGH1Iw3RqszJV\#scrollTo=33JiNK3zRdYj in order to run the demo.
 In the demo, logical operators are represented as follows:
 
 \begin{enumerate}
-	\item Logical NOT: ~
+	\item Logical NOT: \textasciitilde
 	\item Logical AND: \&
 	\item Logical OR: |
-	\item Logical XOR: \^
-	\item Implication: ==>
-	\item Reverse implication: <==
-	\item If and only if: <=>
+	\item Logical XOR: \textasciicircum
+	\item Implication: ==\textgreater
+	\item Reverse implication: \textless==
+	\item If and only if: \textless=\textgreater
 \end{enumerate}
 
 Each of the two agents is provided with a list of sentences, and each sentence may only contain one or two propositions. Run each cell to install the code and the data files in Part 1 of the notebook. In Part 2, look for the code cell with this code:
-run\_dual\_agent\_demo(agent\_1\_initial\_knowledge\_list = [‘~A’, ‘B ==> A’, ‘A \& D’],agent\_2\_initial\_knowledge\_list = [‘B ^ C’],question\_for\_agent\_1 = ‘What is C ?’)
+run\_dual\_agent\_demo(agent\_1\_initial\_knowledge\_list = [‘\textasciitilde A’, ‘B ==\textgreater A’, ‘A \& D’],agent\_2\_initial\_knowledge\_list = [‘B \textasciicircum C’],question\_for\_agent\_1 = ‘What is C ?’)
 Feel free to experiment with different input sentences. Note that the code contains functions to check the syntax of the statements you provide.
 The source code is available at the above link and at https://github.com/CoderRyan800/redesigned-octo-goggles.git
 
 We would like to give credit to two important sources for a great deal of our source code:
 \begin{enumerate}
 	\item The Python repository for the well-known textbook Artificial Intelligence: A Modern Approach is located at https://github.com/aimacode/aima-python and we have borrowed propositional logic code from that repository in order to create training and validation data for our agents. We also use code from this repo to perform syntax checks on user inputs to the agents in our web demo.
-	\item The Keras documentation at https://keras.io/examples/lstm_seq2seq/ and at https://keras.io/examples/lstm_seq2seq_restore/ provides example code that demonstrates sequence-to-sequence models, and we have also utilized this in a somewhat modified form to create and to train our own networks.
+	\item The Keras documentation at https://keras.io/examples/lstm\_seq2seq/ and at https://keras.io/examples/lstm\_seq2seq\_restore/ provides example code that demonstrates sequence-to-sequence models, and we have also utilized this in a somewhat modified form to create and to train our own networks.
 \end{enumerate}
 
 \section{Summary}
