@@ -1,5 +1,5 @@
 \documentclass{article}
-
+\usepackage{url}
 \title{Simple Reasoning and Knowledge States in a LSTM-Based Agent}
 
 \author{Ryan Mukai}
@@ -25,10 +25,10 @@ This article focuses on the development of a simple form of self-awareness in an
 Hence, our definition of self-awareness is a very narrow one that focuses on giving agents the ability to know certain things about their own knowledge state, and it is clear that this is far narrower than anything approaching consciousness. The focus of this article is not on creating a general-purpose reasoning agent since existing literature already covers this in much depth. The focus is instead on having neural network-based agents base their actions on their own understanding of their state of knowledge and use that knowledge to cooperate to solve a problem.
 
 Much work has occurred the field of neural networks and symbolic reasoning.
-A good survey of the field, with numerous references to recent developments, is
+An old survey of the field, with numerous references to other developments, is
 \cite{DBLP:journals/corr/abs-1711-03902}, which is also a nice introduction to
 the field.
-A good but older introduction to neural-symbolic learning is \cite{neural_symbolic_2002},
+An older introduction to neural-symbolic learning is \cite{neural_symbolic_2002},
 and another overview of the field is in
 \cite{bica2015_integrated_neural_symbolic}.
 Reference
@@ -42,23 +42,32 @@ logic and neural networks \cite{multi_valued_logic_2007}, and many other
 approaches have been described in the literature.  The use of LSTMs for
 neuro-symbolic tasks also has a precedent,
 and one example is \cite{captcha_2017}.
-In \cite{possible_worlds}, the authors introduce PossibleWorldNets
+In \cite{DBLP:journals/corr/abs-1802-08535}, the authors introduce PossibleWorldNets
 capable of achieving very good performance on propositional logic problems.
 A very interesting example of symbolic mathematical processing 
-is \cite{microsoft_research_symbolic_math} in which a neural network
-was able to beat Mathematica on complex symbolic mathematical tasks.
+is \cite{lample2019deep} in which a neural network
+was able to beat Mathematica on complex symbolic mathematical tasks, and this
+particular reference illustrates the potential of neural networks to solve
+very difficult symbolic problems in mathematics.  
+
+Self-awareness in neural networks has also been studied, and a survey
+paper is \cite{9045930}.  Our work, which emphasizes a type of self-awareness,
+differs from the methods presented in this survey because the aforementioned
+methods focus on introspection at the architectural, physical, and circuit
+layers.  By contrast, this works focuses on a simple form of symbolic, conceptual
+self-awareness not at the neural layer but at the level of logic concepts.
 
 \section{The Problem Agents are Trained to Solve}
 
-Agents are trained to reason on sentences involving syllogisms and the logical not(\textasciitilde), and (\&), or (|), exclusive-or (\textasciicircum), implication (==\textgreater), and bidirectional implication (\textless==\textgreater) operators. Throughout this article propositions, which can be either True or False, are denoted by the capital letters A through J inclusive. We train agents to handle simple problems of the following forms.
+Agents are trained to reason on sentences involving syllogisms and the logical not(\textasciitilde), and (\&), or ($|$), exclusive-or (\textasciicircum), implication (==\textgreater), and bidirectional implication (\textless==\textgreater) operators. Throughout this article propositions, which can be either True or False, are denoted by the capital letters A through J inclusive. We train agents to handle simple problems of the following forms.
 
 \begin{enumerate}
 	\item Given the status of a propositional variable A as true, false, or unknown, respond to a question about its value.
-	\item Given a simple sentence such as A =\textgreater B and given A is true, answer that B is true if asked about B.
-	\item Given a simple sentence such as A =\textgreater Band given B is false, answer that A is false if asked about A.
-	\item nGiven the value of a and no other information, if asked about B indicate B is unknown.
+	\item Given a simple sentence such as A ==\textgreater \, B and given A is true, answer that B is true if asked about B.
+	\item Given a simple sentence such as A ==\textgreater \, B and given B is false, answer that A is false if asked about A.
+	\item Given the value of A and no other information, if asked about B indicate B is unknown.
 	\item Given contradictory statements, warn that the knowledge base is contradictory.
-	\item In addition to sentences of the form A =\textgreater B, we include sentences of the form (A | B), (A \textasciicircum B), and (A \& B). We also use \textasciitilde to denote logical not.
+	\item In addition to sentences of the form A ==\textgreater \, B, we include sentences of the form (A $|$ B), (A \textasciicircum \, B), (A \textless ==\textgreater \, B), and (A \&  B).
 \end{enumerate}
 
 
@@ -69,14 +78,14 @@ using Keras \cite{chollet2015keras}
 with Tensorflow \cite{tensorflow2015-whitepaper}
 as a backend.
 
-The network is a sequence-to-sequence network of the type that has been used for language translation, and the source code is based directly upon the sequence-to-sequence tutorial found at https://keras.io/examples/lstm\_seq2seq/ although, instead of translating from English to French, we are using the sequence-to-sequence model to answer logical questions.
+The network is a sequence-to-sequence network of the type that has been used for language translation, and the source code is based directly upon the sequence-to-sequence tutorial found at \url{https://keras.io/examples/lstm_seq2seq/} although, instead of translating from English to French, we are using the sequence-to-sequence model to answer logical questions.
 
 The inputs are logic sentences represented with one-hot encoding. These may contain repeated sentences. We use an example to illustrate. Suppose the list of sentences below, one-hot encoded, is our input.
 
 \begin{enumerate}
 	\item A
-	\item A =\textgreater B
-	\item A =\textgreater B
+	\item A ==\textgreater \, B
+	\item A ==\textgreater \, B
 	\item A
 \end{enumerate}
 
@@ -84,7 +93,7 @@ When presented with the above, the network is expected to be able to recall the 
 
 \begin{enumerate}
 	\item A
-	\item A =\textgreater B
+	\item A ==\textgreater \, B
 \end{enumerate}
 
 It is possible during the course of operations that some statements presented to the agent may contain one or more repetitions as shown above, and the agent is trained, upon receiving the query “HELP”, to respond by condensing the knowledge list into just two sentences as shown above. This serves two purposes:
@@ -94,7 +103,7 @@ It is possible during the course of operations that some statements presented to
 	\item When an agent is asked for help, it should be able to supply its knowledge base in response to such a query from another agent.
 \end{enumerate}
 
-If the word “HELP” appears, then the environment sets a help flag and send the question “HELP” to another agent. The other agent’s response, the dump of its knowledge base, is sent back to the first agent, and the first agent tries to answer the question again. If the word “HELP” does not appear, then the other agent is not queried for its knowledge since the first agent’s answer is sufficient.
+If the word “HELP” appears, then the environment sets a help flag and send the question “HELP” to another agent. The other agent’s response, the dump of its knowledge base, is sent back to the first agent, and the first agent tries to answer the question again. If the word “HELP” does not appear, then the other agent is not queried for its knowledge since the first agent's answer is sufficient.
 
 \subsection{Agent Cooperation: Example 1}
 \label{example_1}
@@ -102,7 +111,7 @@ If the word “HELP” appears, then the environment sets a help flag and send t
 Suppose we have two agents, Agent 1 and Agent 2. Agent 1 is given the following knowledge:
 
 \begin{itemize}
-	\item A =\textgreater B
+	\item A ==\textgreater B
 \end{itemize}
 
 Agent 2 is given the following knowledge:
@@ -111,14 +120,14 @@ Agent 2 is given the following knowledge:
 	\item A
 \end{itemize}
 
-If we ask Agent 1 “What is B ?”, the following will occur.
+If we ask Agent 1, ``What is B ?'', the following will occur.
 
 \begin{enumerate}
 	\item Agent 1 indicates B is unknown and requests help.
 	\item The simulation environment, in response to seeing Agent 1 request help, sends a help query to Agent 2.
 	\item Agent 2 dumps its knowledge that A is true.
 	\item This knowledge is added to the knowledge base of Agent 1.
-	\item Agent 1 runs again and is able to finally conclude b is true.
+	\item Agent 1 runs again and is able to finally conclude B is true.
 \end{enumerate}
 
 In this example, we note the following:
@@ -144,7 +153,7 @@ Agents only request help if they do not know the answer but will otherwise answe
 Agent 1 is given the following knowledge:
 
 \begin{itemize}
-	\item A =\textgreater B
+	\item A ==\textgreater \, B
 \end{itemize}
 
 Agent 2 is given the following knowledge:
@@ -153,7 +162,7 @@ Agent 2 is given the following knowledge:
 	\item \textasciitilde B
 \end{itemize}
 
-If we ask Agent 1 “What is A?”, the following will occur.
+If we ask Agent 1, ``What is A?'', the following will occur.
 
 \begin{enumerate}
 	\item Agent 1 indicates a is unknown and requests help.
@@ -165,7 +174,7 @@ If we ask Agent 1 “What is A?”, the following will occur.
 
 \section{Key Results}
 
-The network was found to yield an error rate of slightly less than 1\% on the validation data set logic\_data\_extended\.tsv contained in the gzip tar archive at https://beta1-demo.s3.amazonaws.com/beta\_demo\_data\_files\.tgz, which we have made publicly available to facilitate peer review. In this tab-separated file, the columns are defined as follows:
+The network was found to yield an error rate of slightly less than 1\% on the validation data set logic\_data\_extended\.tsv contained in the gzip tar archive at \url{https://beta1-demo.s3.amazonaws.com/beta_demo_data_files.tgz}, which we have made publicly available to facilitate peer review. In this tab-separated file, the columns are defined as follows:
 
 \begin{enumerate}
 	\item The first column, or column 0, contains a set of logical statements separated by the logical and (\&) operator. This is the input data to the network consisting of logical statements and a question about a variable.
@@ -178,17 +187,17 @@ The network is trained to respond to the question with the answer from column 3 
 \section{Some Limitations}
 
 In the present implementation, an agent is a Python object, and the agent’s knowledge base is still maintained as a Python list of sentences presented to a newly initialized LSTM on each call to the agent. Each run of the neural network involves presenting the sentences and the question (where “help” is one possible question) to the network and subsequently obtaining its output. Maintenance of LSTM state across calls could be used in future editions of the agent to eliminate the need for maintaining an object with a list of sentences. Hence, the “memory” of an agent is still a Python list, although a sequence-to-sequence network performs operations like distilling the list to the essentials or answering questions about the sentences in the list.
-Given that our focus is on agents having a (limited) understanding of their own knowledge state, which is a basic form of self-awareness, much less emphasis has been placed on attempting to achieve general propositional reasoning. An error rate of about 1\% has been achieved on validation data, but the agent may perform poorly if presented with very long chains of reasoning of more than three or four sentences or with combinations of sentences that differ too much from what was seen in training. Users are invited to view the training and validation sets in the Gzipped tar file at https://beta1-demo.s3.amazonaws.com/beta\_demo\_nn\_and\_dictionaries\.tgz to view the kinds of problems we trained the agent to solve.
+Given that our focus is on agents having a (limited) understanding of their own knowledge state, which is a basic form of self-awareness, much less emphasis has been placed on attempting to achieve general propositional reasoning. An error rate of about 1\% has been achieved on validation data, but the agent may perform poorly if presented with very long chains of reasoning of more than three or four sentences or with combinations of sentences that differ too much from what was seen in training. Users are invited to view the training and validation sets in the Gzipped tar file at \url{https://beta1-demo.s3.amazonaws.com/beta_demo_nn_and_dictionaries.tgz} to view the kinds of problems we trained the agent to solve.
 
 \section{Demo and Source Code}
 
-There is a demonstration of this system available for peer review. One may visit the Google CoLab notebook at https://colab.research.google.com/drive/1\_X9NGH3KzFmJYRYNxjOWGH1Iw3RqszJV\#scrollTo=33JiNK3zRdYj in order to run the demo.
+There is a demonstration of this system available for peer review. One may visit the Google CoLab notebook at \url{https://colab.research.google.com/drive/1_X9NGH3KzFmJYRYNxjOWGH1Iw3RqszJV#scrollTo=33JiNK3zRdYj} in order to run the demo.
 In the demo, logical operators are represented as follows:
 
 \begin{enumerate}
 	\item Logical NOT: \textasciitilde
 	\item Logical AND: \&
-	\item Logical OR: |
+	\item Logical OR: $|$
 	\item Logical XOR: \textasciicircum
 	\item Implication: ==\textgreater
 	\item Reverse implication: \textless==
@@ -198,12 +207,12 @@ In the demo, logical operators are represented as follows:
 Each of the two agents is provided with a list of sentences, and each sentence may only contain one or two propositions. Run each cell to install the code and the data files in Part 1 of the notebook. In Part 2, look for the code cell with this code:
 run\_dual\_agent\_demo(agent\_1\_initial\_knowledge\_list = [‘\textasciitilde A’, ‘B ==\textgreater A’, ‘A \& D’],agent\_2\_initial\_knowledge\_list = [‘B \textasciicircum C’],question\_for\_agent\_1 = ‘What is C ?’)
 Feel free to experiment with different input sentences. Note that the code contains functions to check the syntax of the statements you provide.
-The source code is available at the above link and at https://github.com/CoderRyan800/redesigned-octo-goggles.git
+The source code is available at the above link and at \url{https://github.com/CoderRyan800/redesigned-octo-goggles.git}
 
 We would like to give credit to two important sources for a great deal of our source code:
 \begin{enumerate}
-	\item The Python repository for the well-known textbook Artificial Intelligence: A Modern Approach is located at https://github.com/aimacode/aima-python and we have borrowed propositional logic code from that repository in order to create training and validation data for our agents. We also use code from this repo to perform syntax checks on user inputs to the agents in our web demo.
-	\item The Keras documentation at https://keras.io/examples/lstm\_seq2seq/ and at https://keras.io/examples/lstm\_seq2seq\_restore/ provides example code that demonstrates sequence-to-sequence models, and we have also utilized this in a somewhat modified form to create and to train our own networks.
+	\item The Python repository for the well-known textbook Artificial Intelligence: A Modern Approach is located at \url{https://github.com/aimacode/aima-python} and we have borrowed propositional logic code from that repository in order to create training and validation data for our agents. We also use code from this repo to perform syntax checks on user inputs to the agents in our web demo.
+	\item The Keras documentation at \url{https://keras.io/examples/lstm_seq2seq/} and at \url{https://keras.io/examples/lstm_seq2seq_restore/} provides example code that demonstrates sequence-to-sequence models, and we have also utilized this in a somewhat modified form to create and to train our own networks.
 \end{enumerate}
 
 \section{Summary}
