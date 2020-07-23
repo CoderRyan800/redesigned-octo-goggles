@@ -639,7 +639,7 @@ def basic_template_list():
         for second_variable in ['~pp2', 'pp2']:
             for third_variable in ['~pp3', 'pp3']:
                 for fourth_variable in ['pp1', 'pp2', 'pp3', 'pp4', '~pp1', '~pp2', '~pp3', '~pp4']:
-                    for fifth_variable in ['pp1', 'pp2', 'pp3', 'pp4', '~pp1', '~pp2', '~pp3', '~pp4']:
+                    for fifth_variable in list(set(['pp1', 'pp2', 'pp3', '~pp1', '~pp2', '~pp3']) - {fourth_variable}):
                         for first_operator in ['==>', '<=>', '&', '|', '^']:
                             for second_operator in ['==>', '<=>', '&', '|', '^']:
                                 dictionary_1 = {
@@ -688,8 +688,7 @@ def basic_template_list():
             for third_variable in ['~pp3', 'pp3']:
                 for fourth_variable in ['~pp4', 'pp4']:
                     for fifth_variable in ['pp1', 'pp2', 'pp3', 'pp4', 'pp5', '~pp1', '~pp2', '~pp3', '~pp4', '~pp5']:
-                        for sixth_variable in ['pp1', 'pp2', 'pp3', 'pp4', 'pp5', '~pp1', '~pp2', '~pp3', '~pp4',
-                                               '~pp5']:
+                        for sixth_variable in list(set(['pp1', 'pp2', 'pp3', 'pp4', 'pp5', '~pp1', '~pp2', '~pp3', '~pp4', '~pp5']) - {fifth_variable}):
                             for first_operator in ['==>', '<=>', '&', '|', '^']:
                                 for second_operator in ['==>', '<=>', '&', '|', '^']:
                                     for third_operator in ['==>', '<=>', '&', '|', '^']:
@@ -796,7 +795,7 @@ def make_problem_tsv_file(filename):
 
         attempt_index = 0
         while ((problem_answer is None or problem_answer != answer_target) and
-            attempt_index < 50):
+            attempt_index < 100):
             random_choice = np.random.randint(num_templates)
             current_template = long_template_list[random_choice]
             problem_instance = generate_problem_from_template(current_template)
@@ -822,7 +821,6 @@ def make_problem_tsv_file(filename):
     data_dictionary = template_list_to_training_data(template_list = result_list,
                                                      filename = filename)
 # End function make_problem_tsv_file
-#
 # list_of_files = [
 # 'logic_data_extended_00.tsv',
 # 'logic_data_extended_01.tsv',
@@ -880,9 +878,9 @@ def make_problem_tsv_file(filename):
 
 list_of_files = []
 
-#for index in range(50,200):
-for index in range(500,1000):
+for index in range(0,500):
     list_of_files.append('logic_data_extended_%02d.tsv' % (index,))
 
 for filename in list_of_files:
     make_problem_tsv_file(filename)
+
