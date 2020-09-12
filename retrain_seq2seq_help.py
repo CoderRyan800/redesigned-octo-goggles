@@ -307,7 +307,7 @@ list_of_training_files = [
 
 list_of_training_files = []
 
-for index in range(0,400):
+for index in range(0,100):
     list_of_training_files.append('logic_data_extended_%02d.tsv' % (index,))
 
 
