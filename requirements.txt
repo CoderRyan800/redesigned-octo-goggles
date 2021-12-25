@@ -4,7 +4,7 @@ astor==0.8.1
 async-generator==1.10
 attrs==20.2.0
 backcall==0.2.0
-beta==0.1.dev0
+beta
 bleach==3.1.5
 certifi==2020.6.20
 cffi==1.14.2
@@ -13,7 +13,7 @@ cycler==0.10.0
 decorator==4.4.2
 defusedxml==0.6.0
 entrypoints==0.3
-gast==0.4.0
+gast==0.2.2
 google-pasta==0.2.0
 grpcio==1.32.0
 h5py==2.10.0
@@ -53,8 +53,8 @@ pandocfilters==1.4.2
 parso==0.7.1
 pexpect==4.8.0
 pickleshare==0.7.5
-Pillow==7.2.0
-pkg-resources==0.0.0
+Pillow
+#pkg-resources
 prometheus-client==0.8.0
 prompt-toolkit==3.0.7
 protobuf==3.13.0
@@ -70,13 +70,13 @@ pyzmq==19.0.2
 qtconsole==4.7.7
 QtPy==1.9.0
 requests==2.24.0
-scipy==1.5.2
+scipy
 Send2Trash==1.5.0
 six==1.15.0
 sortedcontainers==2.2.2
-tensorboard==1.14.0
-tensorflow==1.14.0
-tensorflow-estimator==1.14.0
+tensorboard==1.15.0
+tensorflow==1.15.0
+tensorflow-estimator==1.15.1
 termcolor==1.1.0
 terminado==0.8.3
 testpath==0.4.4
