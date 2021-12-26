@@ -28,7 +28,6 @@ dependencies:
     - async-generator==1.10
     - attrs==20.2.0
     - backcall==0.2.0
-    - beta
     - bleach==3.1.5
     - certifi==2020.6.20
     - cffi==1.14.2
