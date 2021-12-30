@@ -313,7 +313,7 @@ for index in range(0,100):
 
 num_training_sets = len(list_of_training_files)
 
-epochs = 128
+epochs = 512
 
 for current_epoch in range(0,epochs):
     fp = open('training_log.txt','a')
