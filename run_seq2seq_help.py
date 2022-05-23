@@ -13,7 +13,7 @@ num_samples = 50000  # Number of samples to train on.
 # Path to the data txt file on disk.  Changed from original (commented out) code.
 #data_path = 'fra-eng/fra.txt'
 #data_path = 'fra.txt'
-data_path = 'logic_data_extended.tsv'
+data_path = 'logic_data_extended_200.tsv'
 # Vectorize the data.
 input_texts = []
 target_texts = []
