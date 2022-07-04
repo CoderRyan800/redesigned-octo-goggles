@@ -1,0 +1,16 @@
+@misc{sutskever2014sequence,
+      title={Sequence to Sequence Learning with Neural Networks}, 
+      author={Ilya Sutskever and Oriol Vinyals and Quoc V. Le},
+      year={2014},
+      eprint={1409.3215},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL}
+}
+@misc{cho2014learning,
+      title={Learning Phrase Representations using RNN Encoder-Decoder for Statistical Machine Translation}, 
+      author={Kyunghyun Cho and Bart van Merrienboer and Caglar Gulcehre and Dzmitry Bahdanau and Fethi Bougares and Holger Schwenk and Yoshua Bengio},
+      year={2014},
+      eprint={1406.1078},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL}
+}

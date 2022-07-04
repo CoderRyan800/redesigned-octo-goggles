@@ -1,0 +1,1253 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{lmodern}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same} % disable monospaced font for URLs
+\hypersetup{
+  pdftitle={Self-Aware LSTM-Based Agents},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Self-Aware LSTM-Based Agents}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\hypertarget{introduction}{%
+\section{Introduction}\label{introduction}}
+
+\hypertarget{goal-a-simple-form-of-self-awareness}{%
+\section{Goal: A Simple Form of
+Self-Awareness}\label{goal-a-simple-form-of-self-awareness}}
+
+The goal of this work is the creation of neural-network-based agents
+that can, given a knowledge base of Boolean logic sentences and a
+question regarding the value of a Boolean variable, tell us whether the
+variable in question is true, false, or unknown. In addition to solving
+simple Boolean logic problems, these agents should exhibit
+self-awareness and be capable of exploiting this feature to solve a
+problem cooperatively. Because the term ``self-awareness'' can be
+defined in different ways, we provide our definition below:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  An agent must know whether it possesses adequate knowledge to solve a
+  problem.
+
+  \begin{enumerate}
+  \def\labelenumii{\alph{enumii}.}
+  \item
+    If it possesses adequate knowledge, it should solve the problem.
+  \item
+    If it lacks adequate knowledge, it should request help solving the
+    problem.
+  \end{enumerate}
+\item
+  An agent must know whether its internal knowledge base is
+  contradictory because a contradictory knowledge base in Boolean logic
+  permits any conclusion to be drawn.
+
+  \begin{enumerate}
+  \def\labelenumii{\alph{enumii}.}
+  \item
+    An agent with a contradictory state of knowledge should report this
+    instead of trying to provide an answer because delivering a solution
+    is impossible in this case.
+  \end{enumerate}
+\item
+  An agent should be capable of providing the contents of its knowledge
+  base upon request.
+
+  \begin{enumerate}
+  \def\labelenumii{\alph{enumii}.}
+  \item
+    This implies that the agent has explicit knowledge of its knowledge
+    base contents, which is another form of self-knowledge.
+  \end{enumerate}
+\end{enumerate}
+
+For the purposes of this work, agents fulfilling these three criteria
+are considered ``self-aware''. Self-awareness allows agents with
+contradictory knowledge states to warn the user and avoid providing a
+wrong answer. It also enables agents to cooperate. For example, suppose
+that an agent lacks adequate knowledge to solve a problem and requests
+help from a second agent. The second agent's knowledge may be sufficient
+to allow the first agent to solve the problem. Here, agent
+self-awareness permits cooperation because the first agent knows that it
+must request help (by being aware of the inadequacy of its knowledge
+state). The second agent has direct, symbolic knowledge of the contents
+of its knowledge base and can provide those contents on demand.
+
+In this work, we create neural-network-based agents capable of solving
+simple problems in Boolean logic. Neural networks for solving Boolean
+logic problems and other problems in symbolic mathematics are not new.
+Using neural networks for logical entailment, which is very closely
+connected to such problems, was discussed in (Evans, Saxton, Amos,
+Pushmeet, \& Grefenstette, 2018). Moreover, the related issue of using
+neural networks for symbolic mathematics was covered in (Lample \&
+Charton, 2019). The present work differs from these two reports because
+it emphasizes self-awareness and cooperation in neural-network-based
+agents, a topic not covered in the cited works. Self-aware neural
+network systems were surveyed in (Du, et al., 2020), where the type of
+self-awareness focused on the implementation and operation of the neural
+network itself, with the network having awareness of its own execution
+environment and the ability to optimize its dataflow, resource use, and
+execution within that environment for performance optimization. This is
+a very different type of self-awareness than what is described here,
+because this paper focuses on awareness of one's state of knowledge, not
+on awareness of neural network execution environment and performance.
+
+The present work is organized as follows. We start by defining the
+propositional (Boolean) logic problems that our agents are trained to
+solve and then explain the behavior of the logical agents that we have
+created. Next, we provide an overview of agent architecture, consisting
+of a knowledge base (implemented as a Python list of strings) and an
+LSTM neural network. The basic aspects of LSTM neural networks and the
+particular encoder--decoder architecture used in the present work are
+then described.
+
+\hypertarget{propositional-logic-problems}{%
+\section{Propositional Logic
+Problems}\label{propositional-logic-problems}}
+
+Our treatment of propositional logic very closely follows that used in
+(Norvig, Artificial Intelligence: A Modern Approach, 4th Edition, 2021),
+with our notation, along with many direct quotations, from (Norvig,
+aima-python, n.d.). Specifically, our notation is summarized in Table 1.
+
+\includegraphics[width=5.23in,height=2.13in]{media/image1.png}
+
+The notation given in the ``Python Output'' column of Table 1 will be
+used throughout this paper, as is done in our demonstration system. The
+propositional logic variables are denoted by capital letters ``A''
+through ``J'' (inclusive).
+
+\hypertarget{logical-agents}{%
+\section{Logical Agents}\label{logical-agents}}
+
+Agents in our system are trained to perform propositional inference. An
+agent is presented with a set of sentences and then asked about the
+truth value of a propositional variable. For example, a simple case of
+modus ponens would be as follows:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\caption{Table : Logical Notation}\tabularnewline
+\toprule()
+\begin{minipage}[b]{\linewidth}\raggedright
+Input sentences
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+A
+
+A ==\textgreater{} B
+\end{minipage} \\
+\midrule()
+\endfirsthead
+\toprule()
+\begin{minipage}[b]{\linewidth}\raggedright
+Input sentences
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+A
+
+A ==\textgreater{} B
+\end{minipage} \\
+\midrule()
+\endhead
+Question & What is B ? \\
+Answer & B is true. \\
+\bottomrule()
+\end{longtable}
+
+Agents are based on an LSTM sequence-to-sequence neural network as
+described in the following two sections. When presented with input
+sentences and a question, an agent can respond in one of five possible
+ways:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  True.
+\item
+  False.
+\item
+  Input sentences are contradictory, making an answer impossible.
+\item
+  Input sentences lack adequate information to answer the question.
+
+  \begin{enumerate}
+  \def\labelenumii{\alph{enumii}.}
+  \item
+    In this case, the agent will output a text string requesting
+    ``HELP''.
+  \end{enumerate}
+\item
+  Respond to a request for help from another agent by outputting its
+  knowledge base.
+\end{enumerate}
+
+For example, a contradiction would be as follows:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule()
+\begin{minipage}[b]{\linewidth}\raggedright
+Input sentences
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textasciitilde A
+
+A \& B
+
+C ==\textgreater{} A
+\end{minipage} \\
+\midrule()
+\endhead
+Question & What is C ? \\
+Answer & Contradictory \\
+\bottomrule()
+\end{longtable}
+
+In this example, the sentence ``A \& B'' implies that A is true, whereas
+``\textasciitilde A'' means that A is false. Owing to this
+contradiction, \emph{any} conclusion may be drawn and the knowledge base
+itself is invalid. In such a case, the agent needs to report a
+contradictory state of knowledge from which no conclusion can be drawn.
+
+In another example, we may have insufficient knowledge:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule()
+\begin{minipage}[b]{\linewidth}\raggedright
+Input sentences
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textasciitilde A
+\end{minipage} \\
+\midrule()
+\endhead
+Question & What is C ? \\
+Answer & Unknown HELP! \\
+\bottomrule()
+\end{longtable}
+
+Hence, if a propositional variable is true or false based on the
+sentences of the knowledge base, an agent should be able to answer true
+or false. However, in those cases where the agent's knowledge is either
+contradictory or insufficient, the agent needs to report this. In
+particular, when an agent lacks sufficient information, it should ask
+another agent or agents in the system for help.
+
+The basic flow of agent operation is depicted in Figure 1.
+
+\includegraphics[width=3.62708in,height=6.28056in]{media/image2.png}
+
+Figure : Agent Operation
+
+An agent contains a knowledge base, which is a Python list of strings
+containing sentences of propositional logic (e.g., ``A'', ``A
+==\textgreater{} B''). When an agent is presented with a question, the
+strings from the knowledge base are concatenated with the question
+string to form the string input, which is encoded using a one-hot
+encoding scheme to create an array of inputs. This input array is then
+presented to the LSTM neural network (described in the next section).
+The outputs are one-hot decoded, and the resulting string is returned.
+These stages are explained in greater detail below.
+
+\hypertarget{one-hot-encoding}{%
+\section{One-Hot Encoding}\label{one-hot-encoding}}
+
+Each character in a string, such as a space, a period, a variable name,
+or an operator or part thereof, is uniquely represented as a column
+vector with zeros in all positions except one. For example, a
+straightforward one-hot encoding scheme for the set of letters \{a, b,
+c\} could be described as follows:
+
+\[\begin{matrix}
+a \rightarrow \begin{bmatrix}
+1 \\
+0 \\
+0 \\
+\end{bmatrix} & b \rightarrow \begin{bmatrix}
+0 \\
+1 \\
+0 \\
+\end{bmatrix} & c \rightarrow \begin{bmatrix}
+0 \\
+0 \\
+1 \\
+\end{bmatrix} \\
+\end{matrix}\]
+
+With only three letters to encode, a one-hot vector set with three
+elements, precisely one of which is one with all the rest being zero,
+can be used to encode the letters ``a'', ``b'', and ``c''. For the
+encoding of logical sentences, however, the alphabet has 30 possible
+characters while the output, which can include extra characters, has 42
+possible characters. Hence, each character in an input string is a 30 ×
+1 column vector with 29 zeros and a single one whose location denotes
+the character being encoded. Similarly, each output string character is
+represented by a 42 × 1 vector containing 41 zeros and a single one, the
+position of which indicates the character of the output alphabet being
+encoded. Thus, a string of 11 input characters would be represented by a
+30 × 11 array, and a string of 17 output characters would be represented
+by a 42 × 17 output array. Let \emph{M} denote the maximum allowed
+length of an input sequence, such that we encode the input as a 30 ×
+\emph{M} array. If the input is of length \emph{L} where \emph{L} ≤
+\emph{M}, then the remaining \emph{M} − \emph{L} characters will be
+blank spaces, represented as one of the 30 possible input characters. If
+\emph{L} \textgreater{} \emph{M}, then we truncate at \emph{M}
+characters. Hence, all inputs are set to a uniform size of 30 ×
+\emph{M}, and we denote the input array as \textbf{X}, where the
+\emph{t}\textsuperscript{th} column of the input array is denoted
+\textbf{x}(\emph{t}). The 30 × \emph{M} array is used to create inputs
+for the LSTM encoder--decoder neural network and presented to the LSTM
+encoder stage. At each time step \emph{t}, where \emph{t} ranges from
+zero through (\emph{M} − 1) inclusive, we give \textbf{x}(\emph{t}) to
+the recurrent LSTM sequence-to-sequence network.
+
+The network will generate a set of output vectors \textbf{y}(\emph{t}),
+each of which is a 42 × 1 column. These are concatenated together to
+create the final output array \textbf{Y}. Because neural network outputs
+from the softmax operation described in the following two sections are
+not exactly one or zero (i.e., 0.995 or 0.005 may be obtained instead),
+we use the index of the largest element of each output column vector
+\textbf{y}(\emph{t}) to obtain the output character at step \emph{t}.
+This process of generating \textbf{y}(\emph{t}) given
+\textbf{x}(\emph{t}) lies at the heart of the agent, and an LSTM
+sequence-to-sequence neural network performs this. The basic aspects of
+this network are described in the following three sections.
+
+\hypertarget{basic-neural-networks}{%
+\section{Basic Neural Networks}\label{basic-neural-networks}}
+
+A basic neural network accepts a vector of inputs \textbf{x} and returns
+a vector of outputs \textbf{y}. It normally consists of one or more
+``dense'' layers (Chollet, keras.io, n.d.), each of which can be
+described by the following equation:
+
+\[\text{x}_{i + 1} = f({\mathbf{A}_{i}\mathbf{x}}_{i} + \mathbf{b}_{i})\]
+
+where the subscript \emph{i} denotes the layer, of which there must be
+at least one; \textbf{x}\emph{\textsubscript{i}} is the input vector to
+the layer; \textbf{A}\emph{\textsubscript{i}} is the weight matrix of
+the layer; and \textbf{b}\emph{\textsubscript{i}} is the bias vector.
+The original input vector \textbf{x} is denoted
+\textbf{x}\textsubscript{0}. The function \emph{f} is a non-linear
+function, common choices for which include but are not limited to the
+following:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \(\text{relu}(x) = \left\{ \begin{matrix}
+  x & x \geq 0 \\
+  0 & x < 0 \\
+  \end{matrix} \right.\ \)
+\item
+  \(tanh(x)\)
+\item
+  \(\text{sigmoid}(x) = \frac{1}{1 + \exp( - x)}\)
+\item
+  \(\sigma_{i}\left( \text{x} \right) = \frac{\exp\left( x_{i} \right)}{\sum_{j = 1}^{K}{exp\left( x_{j} \right)}}\)
+\end{enumerate}
+
+The first three equations are applied on an elementwise basis to obtain
+the output vector. The fourth equation defines the softmax function. If
+\textbf{x} is a \emph{K}-dimensional vector then the softmax function is
+also a \emph{K}-dimensional vector with the \emph{i}\textsuperscript{th}
+element defined as in the fourth equation. The softmax vector elements
+are strictly positive and always sum to exactly one. In some cases, the
+identity function \emph{f}(\textbf{x})=\textbf{x} can also be used,
+particularly for the final dense layer of a multilayer network. If a
+network has \emph{N} layers, then the final output will be \textbf{y} =
+\textbf{x}\emph{\textsubscript{N}}, which is the output of the final
+layer. A different function \emph{f} is sometimes used for the final
+layer compared with the previous layers.
+
+Neural networks based on one or more dense layers have numerous
+applications, and we use a dense layer as part of our larger neural
+network in a manner that will be described later. However, such neural
+networks lack any memory; their current output is strictly dependent on
+the current input. In the following two sections, we will discuss a type
+of recurrent neural network whose output depends on both current and
+previous inputs, i.e., an LSTM network.
+
+\hypertarget{lstm-neural-networks}{%
+\section{LSTM Neural Networks}\label{lstm-neural-networks}}
+
+LSTM neural networks are among the most successful recurrent neural
+network architectures for processing series data. Here we provide a
+brief description of these networks, closely following the work of
+Christopher Olah (Olah, 2015), from which we borrow our explanatory
+figures in this section.
+
+Traditional neural networks are designed to have a fixed input vector
+\textbf{x} and a fixed output vector \textbf{h} that depends entirely on
+the input \textbf{x}, and such networks are defined by a function
+\textbf{h} = \emph{f}(\textbf{x}). These neural networks have no memory,
+and \textbf{h} does not depend on previous inputs, only the current
+input \textbf{x}.
+
+A recurrent neural network, in contrast, has an output that depends on
+not only the current input but also all previous inputs. Let
+(\textbf{x}\textsubscript{0}, \textbf{x}\textsubscript{1}, \ldots,
+\textbf{x}\emph{\textsubscript{t}}) denote a time series of inputs and
+(\textbf{h}\textsubscript{0}, \textbf{h}\textsubscript{1}, \ldots,
+\textbf{h}\emph{\textsubscript{t}}) denote the corresponding time series
+of outputs. The resulting recurrent neural network is depicted in Figure
+2.
+
+\includegraphics[width=6.5in,height=1.70764in]{media/image3.png}
+
+Figure : A Recurrent Neural Network
+
+Here, we observe that \textbf{h}\emph{\textsubscript{t}} is a function
+not only of \textbf{x}\emph{\textsubscript{t}} but of all previous
+inputs as well. Hence, recurrent neural networks possess memory, unlike
+traditional neural networks.
+
+One particularly successful type of recurrent neural network is the LSTM
+network, the basic architecture of which is shown in Figure 3.
+
+\includegraphics[width=6.5in,height=2.44167in]{media/image4.png}
+
+Figure : An LSTM Network
+
+We will now explain the internal operation of the LSTM cell in the
+center of Figure 3. In each computational step, the cell state
+\textbf{C}\emph{\textsubscript{t}} is propagated as depicted in Figure
+4.
+
+\includegraphics[width=6.5in,height=2.00764in]{media/image5.png}
+
+Figure : Propagation of Cell State
+
+Here, the state must pass through two key stages: a forgetting stage
+followed by an updating stage. The forgetting stage multiplies elements
+of the previous cell state \textbf{C}\textsubscript{\emph{t−}1} by
+numbers between zero (completely forget that vector element) and one
+(remember that vector element perfectly). The subsequent updating stage
+adds new information to the cell state. The computation of the
+forgetting stage is shown in Figure 5.
+
+\includegraphics[width=6.5in,height=2.00764in]{media/image6.png}
+
+Figure : Forgetting Stage Computation
+
+Once this stage is passed, we must update the cell state. The
+computation of the updating stage is presented in Figure 6.
+
+\includegraphics[width=6.5in,height=2.00764in]{media/image7.png}
+
+Figure : Updating Stage Computation
+
+Combining the above, we see that the new cell state is computed as
+depicted in Figure 7.
+
+\includegraphics[width=6.5in,height=2.00764in]{media/image8.png}
+
+Figure : Computing New Cell State
+
+Once the new cell state has been calculated, it is necessary to compute
+the new output \textbf{h}\emph{\textsubscript{t}}, as shown in Figure 8.
+
+\includegraphics[width=6.5in,height=2.00764in]{media/image9.png}
+
+Figure : Computing the Output of the LSTM Cell
+
+\hypertarget{sequence-to-sequence-lstms}{%
+\section{Sequence-to-Sequence LSTMs}\label{sequence-to-sequence-lstms}}
+
+Sequence-to-sequence LSTMs have been successfully applied to numerous
+complex tasks, including language translation (Bengio, 2014). A
+description of sequence-to-sequence LSTMs can be found in (Le, 2014),
+(Chollet, 2017), and (Bengio, 2014), and our implementation code is a
+modified version of that from (Chollet, 2017). The description of
+sequence-to-sequence LSTMs given here summarizes (Chollet, 2017).
+
+As exemplified in Figure 9, sequence-to-sequence LSTMs involve two LSTM
+networks. The LSTM encoder accepts an input sequence and generates a
+final internal state (\textbf{h}, \textbf{c}), as described in Section
+0. The LSTM decoder takes (\textbf{h}, \textbf{c}) as the input to its
+cells along with the {[}START{]} token and generates an output sequence
+of characters in the target language until the {[}STOP{]} token is
+reached. Hence, the meaning of the original English sentence is captured
+in (\textbf{h}, \textbf{c}) by the LSTM encoder and then converted into
+an output sequence in French (for example) by the LSTM decoder. The
+decoder LSTM cell is presented, initially, with the input (\textbf{h},
+\textbf{c}) capturing the cell state and linguistic meaning from the
+encoder, and this is the initial state passed to the cell. The initial
+input is the {[}START{]} token. The output from the decoder is fed back
+into the input, generating the French phrase one character at a time
+until the network generates a {[}STOP{]} token.
+
+\includegraphics[width=6.5in,height=2.00347in]{media/image10.png}
+
+Figure : Sequence-to-Sequence LSTM
+
+The process of training such a network is known as teacher forcing. In
+teacher forcing, which is illustrated in Figure 10, the input sequence
+begins with the {[}START{]} token and continues one character at a time
+with the desired French phrase. The desired output sequence is the
+selected target phrase. \textbf{Add links for teacher forcing.}
+
+\includegraphics[width=6.5in,height=2.65486in]{media/image11.png}
+
+Figure : Training a Sequence-to-Sequence LSTM
+
+The teacher forcing method has been successfully used to train language
+translation LSTM encoder--decoder networks, and this is the training
+method used in our work.
+
+\hypertarget{bidirectional-lstms-and-sequence-to-sequence-models}{%
+\section{Bidirectional LSTMs and Sequence-to-Sequence
+Models}\label{bidirectional-lstms-and-sequence-to-sequence-models}}
+
+The sequence-to-sequence LSTM described above is unidirectional, with
+information flowing from left to right in Figure 3. In a bidirectional
+LSTM, there are two LSTM layers: one layer processes the sequence from
+left to right, while a second parallel layer processes the sequence in
+the opposite direction, as illustrated in Figure 11. We note that
+bidirectionality can be applied to any type of recurrent neural network,
+not just LSTMs.
+
+\includegraphics[width=6.5in,height=2.29722in]{media/image12.png}
+
+Figure : A Bidirectional Recurrent Neural Network
+
+A bidirectional network allows us to generate output pairs
+(\textbf{x}\emph{\textsubscript{i}},
+\textbf{y}\emph{\textsubscript{i}}), where
+\textbf{x}\emph{\textsubscript{i}} denotes the outputs of the
+left-to-right network and \textbf{y}\emph{\textsubscript{i}} denotes the
+outputs of the reverse (right-to-left) network. The concatenation
+\textbf{z}\emph{\textsubscript{i}} =
+(\textbf{x}\emph{\textsubscript{i}}, \textbf{y}\emph{\textsubscript{i}})
+is a vector whose contents depend on both the previous and future
+characters in the sequence. In cases where the full sequence is
+available, the resulting concatenated vector encodes information about
+the complete sequence, not just the preceding (left) portion of the
+sequence. Hence, the \textbf{z}\emph{\textsubscript{i}} vectors
+outputted by the bidirectional LSTM yield a more comprehensive picture
+of the entire input sequence than that afforded by the original
+\textbf{x}\emph{\textsubscript{i}} output alone.
+
+In the sequence-to-sequence model defined previously, we did not use the
+sequence of outputs as an input to the decoder segment of the
+encoder--decoder architecture. Rather, we simply adopted the final
+encoder state (\textbf{h}, \textbf{c}) as the initial state of the
+decoder network, and we used a start token as the input to go with the
+initial state. Thus, to implement a sequence-to-sequence model that
+takes advantage of bidirectionality, we perform the following steps:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  Make the encoder stage a bidirectional network. This results in two
+  final states, which are (\textbf{h}\textsubscript{f},
+  \textbf{c}\textsubscript{f}) for the forward network and
+  (\textbf{h}\textsubscript{r}, \textbf{c}\textsubscript{r}) for the
+  reverse network.
+\item
+  Concatenate the states. Here, \textbf{h} =
+  (\textbf{h}\textsubscript{f}, \textbf{h}\textsubscript{r}) and
+  \textbf{c} = (\textbf{c}\textsubscript{f},
+  \textbf{c}\textsubscript{r}).
+\item
+  Present this concatenated state (\textbf{h}, \textbf{c}) to the
+  decoder LSTM as its initial state, in exactly the same manner as the
+  previous sequence-to-sequence model.
+\item
+  Run the decoder network in the forward-only direction, just as in the
+  previous sequence-to-sequence model.
+\item
+  Note that the decoder network state vector dimensionality is now twice
+  that of each of the two encoder networks. Previously, the encoder and
+  decoder networks would have had the same state vector dimensionality.
+\end{enumerate}
+
+The neural network adopted here uses 256-dimensional vectors for
+\textbf{h}\textsubscript{f},\textbf{c}\textsubscript{f},\textbf{h}\textsubscript{r},\textbf{c}\textsubscript{r}.
+Hence, we have two parallel 256-dimensional LSTMs running in the forward
+and reverse directions in the encoder stage. This means that the final
+encoder output state (\textbf{h}, \textbf{c}) has 512-dimensional
+\textbf{h} and \textbf{c}. Because this is the initial state for the
+unidirectional decoder LSTM, the decoder LSTM is based on
+512-dimensional vectors.
+
+To reduce the 512-dimensional vector to a one-hot encoded vector, the
+well-known dense neural network layer described previously, with a final
+softmax non-linearity function, is used. The index of the maximum
+element of the output vector tells us which character must be decoded.
+
+\hypertarget{data-sets-for-training-and-testing}{%
+\section{Data Sets for Training and
+Testing}\label{data-sets-for-training-and-testing}}
+
+The data sets consist of tab-separated files with the filename extension
+``tsv'', with tabs used to divide the data into four columns:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  Column 0: Original problem and question. This consists of a Boolean
+  sentence, a period, and a question regarding a Boolean variable. For
+  example, ``(\textasciitilde J \& B) \& F \& (B \& F) \& (B \& F) \& (B
+  \& F) . What is B ?'' comprises the Boolean sentence
+  ``(\textasciitilde J \& B) \& F \& (B \& F) \& (B \& F) \& (B \& F)''
+  and the question ``What is B ?''. Here, Boolean clauses or variables
+  can be randomly repeated one or more times, and in this example ``(B
+  \& F)'' is repeated three times.
+\item
+  Column 1: Simplified problem and question. Here, all repetitions of
+  Boolean clauses, including single-variable clauses, are removed. The
+  sentence is still separated from the question by a period. For
+  example, ``(\textasciitilde J \& B) \& F \& (B \& F) . What is B ?''
+  is the entry corresponding to the sentence above, but with the
+  repetitions removed. Hence, the Boolean sentence that comes before the
+  question has the exact same meaning, but with the repetitions removed
+  it is a concise version of the original sentence. The question remains
+  unchanged from the first column.
+\item
+  Column 2: Simplified Boolean sentence. In this example, it would be
+  ``(\textasciitilde J \& B) \& F \& (B \& F)'', which is the simplified
+  sentence from column 1 but without the question.
+\item
+  Column 3: The desired answer. The four possible desired answers are:
+
+  \begin{enumerate}
+  \def\labelenumii{\alph{enumii}.}
+  \item
+    ``TRUE''.
+  \item
+    ``FALSE''.
+  \item
+    ``Contradictory''.
+  \item
+    ``Unknown HELP!''.
+  \item
+    In this example, the desired answer is ``TRUE'' because the variable
+    B is TRUE given the sentence ``(\textasciitilde J \& B) \& F \& (B
+    \& F)''.
+  \end{enumerate}
+\end{enumerate}
+
+The above example would appear in a spreadsheet as follows:
+
+\includegraphics[width=6.5in,height=0.14931in]{media/image13.emf}
+
+All of the training data exist in this four-column tab-separated format.
+These data need to be one-hot encoded to create inputs and targets for
+the neural network. For each line in the training set, two string pairs
+are created:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  Pair 1: This consists of the original string in column 0 and the
+  target string in column 3.
+
+  \begin{enumerate}
+  \def\labelenumii{\alph{enumii}.}
+  \item
+    In the example above, the pair would be (``(\textasciitilde J \& B)
+    \& F \& (B \& F) \& (B \& F) \& (B \& F) . What is B ?'', ``TRUE'').
+  \end{enumerate}
+\item
+  Pair 2: This consists of the Boolean sentence in column 0, with the
+  question replaced by ``HELP'', followed by the simplified sentence of
+  column 2.
+
+  \begin{enumerate}
+  \def\labelenumii{\alph{enumii}.}
+  \item
+    In the example above, the pair would be (``(``(\textasciitilde J \&
+    B) \& F \& (B \& F) \& (B \& F) \& (B \& F) .
+    HELP'',''(\textasciitilde J \& B) \& F \& (B \& F)'').
+  \end{enumerate}
+\end{enumerate}
+
+The purposes of the two training pairs are as follows:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  Pair 1: Teach the neural network how to answer a question about a
+  Boolean variable when given a Boolean sentence.
+
+  \begin{enumerate}
+  \def\labelenumii{\alph{enumii}.}
+  \item
+    If the sentence is contradictory, then no answer is possible and the
+    network must indicate ``Contradictory''.
+  \item
+    If there is insufficient information, the network should respond
+    with ``Unknown HELP!''.
+  \item
+    If the sentence implies that the variable is true, then the network
+    should respond with ``TRUE''.
+  \item
+    If the sentence implies that the variable is false, then the network
+    should respond with ``FALSE''.
+  \end{enumerate}
+\item
+  Pair 2: Teach the neural network to consolidate a knowledge base,
+  which may contain repetitions, and to dump a concise version of the
+  knowledge base upon receiving a request for help.
+
+  \begin{enumerate}
+  \def\labelenumii{\alph{enumii}.}
+  \item
+    Here, the question is replaced by the word ``HELP''.
+  \item
+    Upon seeing the keyword ``HELP'' instead of a question, the network
+    should create a concise version of the knowledge base without any
+    repetition and dump that concise knowledge base out.
+  \item
+    The network must dump out the concise version faithfully without
+    error and without repetition.
+  \end{enumerate}
+\end{enumerate}
+
+Hence, the goal of training is to enable the neural network to perform
+two basic functions:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  Perform Boolean reasoning and answer a question regarding a Boolean
+  variable given a possibly repetitive, contradictory, or incomplete
+  knowledge base.
+\item
+  Perform simplification and return a concise version of a knowledge
+  base upon a request for help.
+\end{enumerate}
+
+The two functions described above are central to agent operation as
+depicted in Figure 1. The agent's internal Python list stores Boolean
+sentences and is the knowledge base of the agent. If an agent is asked a
+question about the value of a Boolean variable, then the following
+operations should take place:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  The sentences of the knowledge base are concatenated using the logical
+  AND operator, which is the ampersand symbol ``\&''.
+\item
+  The resulting large Boolean sentence is concatenated with the question
+  following a period to create the input string.
+\item
+  The input string is one-hot encoded and fed to the neural network.
+\item
+  The neural network output is one-hot decoded to create an output
+  string, which should be one of the four possible responses to a
+  question about a Boolean variable.
+\end{enumerate}
+
+Hence, the aforementioned pair 1 is used to teach the neural network how
+to perform the Boolean reasoning operation. On the other hand, if an
+agent is asked for help instead of being asked a question about a
+Boolean variable, then the workflow is as follows:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  The sentences of the knowledge base are concatenated using the logical
+  AND operator (the ``\&'' symbol) as above.
+\item
+  However, the large Boolean sentence is now concatenated with the word
+  ``HELP'', which is separated by a period from the large sentence from
+  step 1.
+\item
+  The input string is one-hot encoded and sent to the network.
+\item
+  The network output is one-hot decoded and should ideally contain a
+  concise and correct Boolean sentence describing the agent's knowledge
+  base, without any repetitions.
+\end{enumerate}
+
+Hence, the aforementioned pair 2 is used to teach the neural network how
+to respond to a request for help by providing a correct and concise dump
+of the agent's knowledge base.
+
+\hypertarget{accuracy-metric}{%
+\section{Accuracy Metric}\label{accuracy-metric}}
+
+Agent performance is measured by simple string comparison. The output of
+the agent's neural network is one-hot decoded to create a string, which
+is compared with the target string. In the case of pair 1, where the
+agent must answer a question about a Boolean variable, the output string
+possibilities are ``TRUE'', ``FALSE'', ``Contradictory'', and ``Unknown
+HELP!''. An exact string match is required for the agent's response to
+be considered correct. For example, if the correct answer is ``FALSE'',
+then the agent's response is scored as correct only if its output string
+exactly matches ``FALSE''. Responses such as ``F'', ``false'',
+``False'', and ``fALse'' would all be scored as incorrect. Similarly, in
+the case of pair 2, where the neural network has to perform a knowledge
+base dump in response to a request for help, the output must exactly
+match the target string, which contains all of the Boolean clauses of
+the input string, in exactly the same order, but without any repetition.
+If the correct answer is ``(\textasciitilde J \& B) \& F \& (B \& F)'',
+then answers such as ''(\textasciitilde J \& B) \& (B \& F) \& F'',
+while clearly logically equivalent, will still be marked as wrong.
+Hence, to achieve a score of 98\%, for example, an agent's outputs must
+be an exact string match to the target 98\% of the time, and even
+logically equivalent outputs that are not an exact match will be scored
+as wrong. This is a different metric to the character-by-character
+accuracy metric, in which a string with a single character error is
+marked as wrong, even when all of the characters but one are correct.
+
+\hypertarget{data-sets}{%
+\section{Data Sets}\label{data-sets}}
+
+Each tab-separated file contains 25,000 lines, each of which is used to
+create both a logic problem (pair 1) and a problem of restating
+knowledge concisely (pair 2). Hence, each file will yield a total of
+50,000 training problems split evenly between Boolean reasoning and
+concise knowledge recitation. The first 100 files, with filenames
+``logic\_data\_extended\_00.tsv'' through
+``logic\_data\_extended\_99.tsv'', are the training files. The remaining
+files, which are ``logic\_data\_extended\_100.tsv'' through
+``logic\_data\_extended\_233.tsv'', are for accuracy testing.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  Future neural networks may train on nearly all of these files. The
+  neural network as of repository commit
+  fe2b92d6c7c25b2752650b0358a3df885b794558 from December 29, 2021, was
+  trained on the first 100 files as stated above. It remains to be seen
+  whether the accuracy can be improved by training on a larger number of
+  files.
+\item
+  The author intends to generate a total of 500 data sets and use the
+  majority of these to train a new version of the network to determine
+  whether improved accuracy can be attained.
+\item
+  The author has obtained accuracy exceeding 98\% with the existing
+  network for data set logic\_data\_extended\_200.tsv, a data set not
+  used in training.
+\end{enumerate}
+
+It is now important to point out some of the limitations of the data
+sets in the present work. Although the problems are randomly generated,
+a large percentage of the problems, unfortunately, tend to allow a
+network to deduce a value as true or false simply based on a single
+Boolean term. This is undoubtedly a weakness of the present randomized
+clause generator, and it will result in some shortcomings when the
+network is presented with highly complex Boolean sentences. The goal of
+this work is to focus on the concept of self-awareness, not to create a
+general-purpose Boolean reasoning system. Even so, the biases with
+respect to data set generation are a deficiency that must be addressed
+in future work. The present agents are able to demonstrate the basic
+criteria of self-awareness that are the goal of this work, but readers
+are cautioned that they may make errors in Boolean reasoning,
+particularly for moderately to highly complex sentences. This will
+require improvements to the data set generation procedures. Data set
+generation is a random process that can be summarized as follows:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  Boolean variables are randomly selected to populate a sentence.
+
+  \begin{enumerate}
+  \def\labelenumii{\alph{enumii}.}
+  \item
+    Some of these are randomly negated to ensure that we have both
+    positive and negative atomic Boolean terms.
+  \end{enumerate}
+\item
+  Binary logic operators, such as logical AND, OR, and implication, are
+  randomly selected to create binary clauses.
+\item
+  Randomly generated terms and clauses are joined using the logical AND
+  (``\&'') operator to create sentences.
+\item
+  A variable is randomly chosen for the question, and each question is
+  always about the value of a single variable, which may be negated.
+\item
+  The resulting sentences are processed using automatic reasoning code,
+  taken from (Norvig, aima-python, n.d.), to determine whether the
+  variable is true or false, or whether the input knowledge is
+  insufficient or contradictory.
+\item
+  The clauses of the sentences may be repeated one or more times to
+  generate the ``long'' versions of the sentences.
+\item
+  The ``long'' sentence, with repetition, is concatenated with the
+  question to create the column 0 entry.
+\item
+  The ``short'' sentence, without repetition, is concatenated with the
+  question to create the column 1 entry.
+\item
+  The ``short'' sentence, without repetition, becomes the column 2
+  entry.
+\item
+  The answer to the question (e.g., ``TRUE'', ``FALSE'') becomes the
+  column 3 entry.
+\end{enumerate}
+
+The choice to include repetition in the data set design requires some
+explanation:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  In earlier attempts, Boolean reasoning performance without the
+  repeated clauses proved to be poor. For example, if an agent saw a
+  clause repeated twice, it could make errors in reasoning.
+
+  \begin{enumerate}
+  \def\labelenumii{\alph{enumii}.}
+  \item
+    In multi-agent scenarios, if a given sentence was known to two
+    agents, the repetition of the sentence would sometimes result in
+    reasoning errors. This was the original motivation for our
+    repetitive clause training.
+  \end{enumerate}
+\item
+  Forcing agents to learn how to create a concise sentence with each
+  clause present only once is believed to teach their internal neural
+  network to treat clauses as conceptual units, resulting in
+  improvements to reasoning performance.
+
+  \begin{enumerate}
+  \def\labelenumii{\alph{enumii}.}
+  \item
+    This is a hypothesis, however, that requires further testing, and
+    the author does not claim sufficient evidence to assert that this
+    type of training actually does teach a neural network to treat terms
+    and clauses as conceptual units.
+  \end{enumerate}
+\end{enumerate}
+
+All of the data set files are available at (Mukai, S3 Source Code and
+Data Sets, n.d.) to facilitate peer review and make both the strengths
+and weaknesses of the training and test data easily accessible and
+understood.
+
+\hypertarget{key-software-used-and-neural-network-specifications}{%
+\section{Key Software Used and Neural Network
+Specifications}\label{key-software-used-and-neural-network-specifications}}
+
+The source code is publicly available at (Mukai, LSTM Source Code, n.d.)
+and is based on previously developed code for LSTM neural networks
+(Chollet, keras.io, n.d.) and Boolean logic (Norvig, aima-python, n.d.).
+The training and testing process works as follows:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  The program train\_seq2seq\_help.py is used to
+
+  \begin{enumerate}
+  \def\labelenumii{\alph{enumii}.}
+  \item
+    Create the neural network itself.
+  \item
+    Perform a training epoch on logic\_data\_extended\_00.tsv.
+  \item
+    Save the resulting neural network.
+  \end{enumerate}
+\item
+  The neural network created is a bidirectional LSTM with
+\item
+  The program retrain\_seq2seq\_help.py is used to
+
+  \begin{enumerate}
+  \def\labelenumii{\alph{enumii}.}
+  \item
+    Load the neural network created in step 1 above.
+  \item
+    Run for a specified number of epochs (presently 512).
+  \item
+    On each epoch:
+
+    \begin{enumerate}
+    \def\labelenumiii{\roman{enumiii}.}
+    \item
+      Randomly select a training set from logic\_data\_extended\_00.tsv
+      through logic\_data\_extended\_99.tsv.
+    \item
+      Perform a training epoch using the randomly selected data set.
+    \end{enumerate}
+  \end{enumerate}
+\item
+  The program run\_seq2seq\_help.py is used to
+
+  \begin{enumerate}
+  \def\labelenumii{\alph{enumii}.}
+  \item
+    Load the neural network.
+  \item
+    Load the file logic\_data\_extended\_200.tsv for use as a test set
+    (this was not used in the training above).
+  \item
+    Compute the neural network accuracy over this data set.
+  \end{enumerate}
+\item
+  The program run\_seq2seq\_demo.py is not a standalone program. It is
+  simply imported in our web demo at (Mukai, Dual Agent Demo, 2022) to
+  illustrate a two-agent system with basic self-awareness.
+\end{enumerate}
+
+\hypertarget{web-demo}{%
+\section{Web Demo}\label{web-demo}}
+
+The goal of the Google Colab web demo is to provide a simple
+demonstration of agent self-awareness, which, again, is defined as an
+agent's ability to be aware of its own knowledge state (in this case
+being aware of not knowing the right answer) and acting according (in
+this case by requesting aid from another agent).
+
+In the web demo, agent 1 begins with two facts:
+
+\begin{quote}
+\textasciitilde A
+
+C ==\textgreater{} B
+\end{quote}
+
+Agent 2 begins with just one fact:
+
+B ==\textgreater{} A
+
+Agent 1 is presented with the following question:
+
+What is C ?
+
+However, agent 1 does not possess sufficient information to ascertain
+the value of C. At this stage, agent 1 asks for help, causing agent 2 to
+dump its knowledge base. Agent 1 is now armed with all three facts:
+
+\begin{quote}
+\textasciitilde A
+
+C ==\textgreater{} B
+
+B ==\textgreater{} A
+\end{quote}
+
+Thus, agent 1 can reason that because A is false and B ==\textgreater{}
+A, then B must be false. Because B is false, then C ==\textgreater{} B
+implies that C is also false. The demo ends with agent 1 indicating that
+C is false.
+
+Agent 1 demonstrates a very simple form of self-awareness in terms of
+being aware of its own lack of knowledge. When agent 1 realizes that it
+lacks the knowledge to answer the question regarding Boolean variable C,
+it asks for help. Likewise, agent 2 also demonstrates a simple form of
+self-awareness in that it knows what its knowledge base contains and
+will dump those contents in response to a request for help. It should be
+noted that this self-awareness is a property of the agent, which is a
+composite of a neural network plus a Python list knowledge base and
+appropriate code that performs one-hot encoding and decoding and can
+generate or receive a request for help. Hence, the neural network, while
+certainly the most important part of the agent, is not the entire agent.
+Thus, self-awareness is a property of the complete agent, not a property
+of the neural network as a standalone entity.
+
+\hypertarget{summary-and-conclusions}{%
+\section{Summary and Conclusions}\label{summary-and-conclusions}}
+
+This work presents agents that exhibit a simple form of self-awareness
+defined by the following:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  Knowledge of one's own knowledge base.
+
+  \begin{enumerate}
+  \def\labelenumii{\alph{enumii}.}
+  \item
+    This is exemplified by the ability to provide a concise version of
+    its knowledge base upon a request for help from another agent.
+  \end{enumerate}
+\item
+  Knowledge of one's own knowledge state.
+
+  \begin{enumerate}
+  \def\labelenumii{\alph{enumii}.}
+  \item
+    The ability to know whether one's knowledge is contradictory.
+  \item
+    The ability to know whether one's knowledge is insufficient.
+  \item
+    The ability to answer a question when one has sufficient and
+    non-contradictory knowledge.
+  \end{enumerate}
+\end{enumerate}
+
+There are multiple ways that self-awareness can be defined, and the
+definition used here is very simple. It falls significantly short of the
+much broader reasoning-about-knowledge capability that is characteristic
+of epistemic modal logic, which is a possible future direction. The fact
+that neural networks can be used to process complex mathematical
+formulas (Evans, Saxton, Amos, Pushmeet, \& Grefenstette, 2018) (Lample
+\& Charton, 2019), including those requiring logical entailment, suggest
+that this is a reasonable avenue for future research. Agents using
+epistemic modal logic have a considerably deeper ability to reason about
+their own knowledge and the knowledge of other agents, which may make
+this a promising direction.
+
+Because Boolean reasoning already entails substantial computational
+complexity, and considering that well-known neural networks have been
+able to excel in handling problems with exponential complexity, most
+notably the game of Go (DeepMind, n.d.), a promising variation of this
+work may involve using neural networks to guide a formal reasoning
+engine. This will help to prevent outright errors in reasoning, a
+weakness of the present work, while simultaneously helping to overcome
+the exponential complexity of reasoning, which can be a significant
+problem with epistemic modal logic.
+
+Hence, this work represents a starting point. The form of self-awareness
+described here is extremely basic, but the presented work should serve
+as a proof of concept to demonstrate the potential of
+neural-network-based systems to exhibit a basic form of self-awareness.
+
+\hypertarget{references}{%
+\section{References}\label{references}}
+
+Bengio, K. C. (2014, September 3). \emph{Learning Phrase Representations
+using RNN Encoder-Decoder for Statistical Machine Translation.}
+Retrieved from arXiv: https://arxiv.org/abs/1406.1078
+
+Chollet, F. (2017, September 29). \emph{A ten-minute introduction to
+sequence-to-sequence learning in Keras.} Retrieved from The Keras Blog:
+https://blog.keras.io/a-ten-minute-introduction-to-sequence-to-sequence-learning-in-keras.html
+
+Du, B., Guo, Q., Zhao, Y., Zhi, T., Chen, Y., \& Xu, Z. (2020).
+Self-Aware Neural Network Systems: A Survey and New Perspective.
+\emph{Proceedings of the IEEE}, 1047-\/-1067.
+
+Evans, R., Saxton, D., Amos, D., Pushmeet, K., \& Grefenstette, E.
+(2018). \emph{Can Neural Networks Understand Logical Entailment?}
+Retrieved from arXiv: http://arxiv.org/abs/1802.08535
+
+Lample, G., \& Charton, F. (2019). \emph{Deep Learning for Symbolic
+Mathematics.} Retrieved from arXiv: https://arxiv.org/pdf/1912.01412.pdf
+
+Le, I. S. (2014, June 3). \emph{Sequence to Sequence Learning with
+Neural Networks.} Retrieved from arXiv: https://arxiv.org/abs/1406.1078
+
+Mukai, R. (2022, February 11). \emph{Dual Agent Demo}. Retrieved from
+Dual Agent Demo:
+https://colab.research.google.com/drive/1Tr2AQKTGtG3VnNgHhRFLt2BXiXqSb3No?usp=sharing
+
+Norvig, S. J. (2021). \emph{Artificial Intelligence: A Modern Approach,
+4th Edition.} Hoboken, NJ: Pearson Education, Inc.
+
+Norvig, S. J. (n.d.). \emph{aima-python}. Retrieved from aima-python:
+https://github.com/aimacode/aima-python
+
+Olah, C. (2015, August 27). \emph{Understanding LSTM Networks}.
+Retrieved from colah's blog:
+https://colah.github.io/posts/2015-08-Understanding-LSTMs/
+
+Bengio, K. C. (2014). \emph{Learning Phrase Representations using RNN
+Encoder-Decoder for Statistical Machine Translation.} Retrieved from
+arXiv: https://arxiv.org/abs/1406.1078
+
+Chollet, F. (2017). \emph{A ten-minute introduction to
+sequence-to-sequence learning in Keras.} Retrieved from The Keras Blog:
+https://blog.keras.io/a-ten-minute-introduction-to-sequence-to-sequence-learning-in-keras.html
+
+Du, B., Guo, Q., Zhao, Y., Zhi, T., Chen, Y., \& Xu, Z. (2020).
+Self-Aware Neural Network Systems: A Survey and New Perspective.
+\emph{Proceedings of the IEEE}, 108, 1047--1067
+
+Evans, R., Saxton, D., Amos, D., Pushmeet, K., \& Grefenstette, E.
+(2018). \emph{Can Neural Networks Understand Logical Entailment?}
+Retrieved from arXiv: http://arxiv.org/abs/1802.08535
+
+Lample, G., \& Charton, F. (2019). \emph{Deep Learning for Symbolic
+Mathematics.} Retrieved from arXiv: https://arxiv.org/pdf/1912.01412.pdf
+
+Le, I. S. (2014). \emph{Sequence to Sequence Learning with Neural
+Networks.} Retrieved from arXiv: https://arxiv.org/abs/1406.1078
+
+Mukai, R. (2022). \emph{Dual Agent Demo}. Retrieved from Dual Agent
+Demo:
+https://colab.research.google.com/drive/1Tr2AQKTGtG3VnNgHhRFLt2BXiXqSb3No?usp=sharing
+
+Norvig, S. J. (2021). \emph{Artificial Intelligence: A Modern Approach,
+4th Edition.} Hoboken, NJ: Pearson Education, Inc.
+
+Norvig, S. J. (n.d.). \emph{aima-python}. Retrieved from aima-python:
+https://github.com/aimacode/aima-python
+
+Olah, C. (2015). \emph{Understanding LSTM Networks}. Retrieved from
+Colah's blog: https://colah.github.io/posts/2015-08-Understanding-LSTMs/
+
+\end{document}
