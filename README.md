@@ -1,4 +1,4 @@
-# redesigned-octo-goggles
+# Self Aware LSTM Project
 Second stage of neural networks and reasoning project
 
 This project represents an advance over the early agent architecture at https://github.com/CoderRyan800/alpha
