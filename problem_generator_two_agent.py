@@ -745,7 +745,258 @@ def basic_template_list():
 
 # End basic_template_list
 
+#### TODO: Create a two-agent or N-agent template generator.  Have agent 1's list contain some
+#### protovariables, and have agent 2's list contain another set.  Have the question ask about a
+#### protovariable that is "disjointed" from the sentences in agent 1's list.  For example,
+#### agent 1 might have ['pp1 => pp2', 'pp3 => pp4'] and the question could be what is pp1?
+#### Agent 1 can't solve it without knowing agent 2's list ['pp2 => pp3'], so if pp4 is false
+#### then pp1 is also false, but agent 1 must collaborate to find it.  Have two answers.  First
+#### verify agent 1's initial response, then verify agent 2's knowledge dump, then verify
+#### agent 1's final response.  Also, design the agent so if agent 2 has contradictory knowledge
+#### then verify agent 1's final response is unknown and contradiction.
+
+
+def two_agent_template_list():
+    """
+    This just returns a very simple template list, which is hard coded.
+    :return: List of templates
+    """
+
+    template_list_0 = [
+        # Core common sense - you can't state an answer if you know nothing and
+        # if you're given an answer then use it!
+        {
+            "statement_list_1": [],
+            "statement_list_2": [],
+            "question": "pp1"
+        },
+        {
+            "statement_list_1": ["pp1"],
+            "statement_list_2": [],
+            "question": "pp1"
+        },
+        {
+            "statement_list_1": ["pp1"],
+            "statement_list_2": [],
+            "question": "~pp1"
+        },
+        {
+            "statement_list_1": ["~pp1"],
+            "statement_list_2": [],
+            "question": "pp1"
+        },
+        {
+            "statement_list_1": ["~pp1"],
+            "statement_list_2": [],
+            "question": "~pp1"
+        },
+
+        # Core common sense - if you're given an answer for an irrelevant variable
+        # then you can't answer!
+
+        {
+            "statement_list_1": ["~pp1"],
+            "statement_list_2": [],
+            "question": "pp3"
+        },
+        {
+            "statement_list_1": ["~pp1"],
+            "statement_list_2": [],
+            "question": "~pp3"
+        },
+        {
+            "statement_list_1": ["pp1"],
+            "statement_list_2": [],
+            "question": "~pp3"
+        },
+        {
+            "statement_list_1": ["pp1"],
+            "statement_list_2": [],
+            "question": "pp3"
+        }
+    ]
+
+    # Next, create very simple if-then problems.
+    # Start with only the if-then where you cannot draw
+    # conclusions and work from there.
+    template_list_1 = []
+    for first_variable in ['~pp1', 'pp1']:
+        for second_variable in ['~pp2', 'pp2']:
+            for third_variable in ['pp1', 'pp2', 'pp3', 'pp4',
+            '~pp1', '~pp2', '~pp3', '~pp4']:
+                for fourth_variable in ['pp1', 'pp2', 'pp3', 'pp4',
+                '~pp1', '~pp2', '~pp3', '~pp4']:
+                    for first_operator in ['==>', '<=>', '&', '|', '^']:
+
+                        dictionary_1 = {
+                            'statement_list_1' : ["%s %s %s" % (first_variable, first_operator, second_variable)],
+                            'statement_list_2' : [],
+                            'question': "%s" % (fourth_variable,)
+                        }
+
+                        dictionary_2 = copy.deepcopy(dictionary_1)
+                        dictionary_2['statement_list_2'].append(third_variable)
+
+                        template_list_1.append(dictionary_1)
+                        template_list_1.append(dictionary_2)
+
+                        extraneous_var_list_1 = ['pp7', '~pp7', 'pp8', '~pp8', 'pp9', '~pp9']
+                        extraneous_var_list_2 = ['pp8', '~pp8']
+                        extraneous_var_list_3 = ['pp9', '~pp9']
+
+                        extraneous_operator_list = ['==>', '<=>', '&', '|', '^']
+
+                        extraneous_var_1 = extraneous_var_list_1[np.random.randint(len(extraneous_var_list_1))]
+                        extraneous_var_2 = extraneous_var_list_2[np.random.randint(len(extraneous_var_list_2))]
+                        extraneous_var_3 = extraneous_var_list_3[np.random.randint(len(extraneous_var_list_3))]
+                        extraneous_operator = extraneous_operator_list[np.random.randint(len(extraneous_operator_list))]
+
+                        extraneous_statement = "%s %s %s" % (extraneous_var_2, extraneous_operator, extraneous_var_3)
+
+                        dictionary_3 = copy.deepcopy(dictionary_1)
+                        dictionary_4 = copy.deepcopy(dictionary_2)
+
+                        dictionary_3['statement_list_2'].append(extraneous_var_1)
+                        dictionary_3['statement_list_2'].append(extraneous_statement)
+
+                        dictionary_4['statement_list_2'].append(extraneous_var_1)
+                        dictionary_4['statement_list_2'].append(extraneous_statement)
+
+                        template_list_1.append(dictionary_3)
+                        template_list_1.append(dictionary_4)
+
+    # End loop for basic if-then
+
+    # Next, consider two-stage if-then modus ponens.
+    template_list_2 = []
+    for first_variable in ['~pp1', 'pp1']:
+        for second_variable in ['~pp2', 'pp2']:
+            for third_variable in ['~pp3', 'pp3']:
+                for fourth_variable in ['pp1', 'pp2', 'pp3', 'pp4', '~pp1', '~pp2', '~pp3', '~pp4']:
+                    for fifth_variable in ['pp1', 'pp2', 'pp3', 'pp4', '~pp1', '~pp2', '~pp3', '~pp4']:
+                        for first_operator in ['==>', '<=>', '&', '|', '^']:
+                            for second_operator in ['==>', '<=>', '&', '|', '^']:
+                                dictionary_1 = {
+                                    'statement_list_1': ["%s %s %s" % (first_variable, first_operator, second_variable)],
+                                    'statement_list_2': ["%s %s %s" % (second_variable, second_operator, third_variable)],
+                                    'question': "%s" % (fifth_variable,)
+                                }
+
+                                dictionary_2 = copy.deepcopy(dictionary_1)
+                                dictionary_2['statement_list_2'].append(fourth_variable)
+
+                                template_list_2.append(dictionary_1)
+                                template_list_2.append(dictionary_2)
+
+                                extraneous_var_list_1 = ['pp7', '~pp7', 'pp8', '~pp8', 'pp9', '~pp9']
+                                extraneous_var_list_2 = ['pp8', '~pp8']
+                                extraneous_var_list_3 = ['pp9', '~pp9']
+
+                                extraneous_operator_list = ['==>', '<=>', '&', '|', '^']
+
+                                extraneous_var_1 = extraneous_var_list_1[np.random.randint(len(extraneous_var_list_1))]
+                                extraneous_var_2 = extraneous_var_list_2[np.random.randint(len(extraneous_var_list_2))]
+                                extraneous_var_3 = extraneous_var_list_3[np.random.randint(len(extraneous_var_list_3))]
+                                extraneous_operator = extraneous_operator_list[np.random.randint(len(extraneous_operator_list))]
+
+                                extraneous_statement = "%s %s %s" % (extraneous_var_2, extraneous_operator, extraneous_var_3)
+
+                                dictionary_3 = copy.deepcopy(dictionary_1)
+                                dictionary_4 = copy.deepcopy(dictionary_2)
+
+                                dictionary_3['statement_list_2'].append(extraneous_var_1)
+                                dictionary_3['statement_list_2'].append(extraneous_statement)
+
+                                dictionary_4['statement_list_2'].append(extraneous_var_1)
+                                dictionary_4['statement_list_2'].append(extraneous_statement)
+
+                                template_list_2.append(dictionary_3)
+                                template_list_2.append(dictionary_4)
+
+    #End loop for two-stage if-then
+
+    # Next, consider three-stage if-then modus ponens.
+    template_list_3 = []
+    for first_variable in ['~pp1', 'pp1']:
+        for second_variable in ['~pp2', 'pp2']:
+            for third_variable in ['~pp3', 'pp3']:
+                for fourth_variable in ['~pp4', 'pp4']:
+                    for fifth_variable in ['pp1', 'pp2', 'pp3', 'pp4', 'pp5', '~pp1', '~pp2', '~pp3', '~pp4', '~pp5']:
+                        for sixth_variable in ['pp1', 'pp2', 'pp3', 'pp4', 'pp5', '~pp1', '~pp2', '~pp3', '~pp4',
+                                               '~pp5']:
+                            for first_operator in ['==>', '<=>', '&', '|', '^']:
+                                for second_operator in ['==>', '<=>', '&', '|', '^']:
+                                    for third_operator in ['==>', '<=>', '&', '|', '^']:
+                                        dictionary_1 = {
+                                            'statement_list_1': ["%s %s %s" % (first_variable, first_operator, second_variable),
+                                                                 "%s %s %s" % (third_variable, third_operator, fourth_variable)],
+                                            'statement_list_2': ["%s %s %s" % (second_variable, second_operator, third_variable)],
+
+                                            'question': "%s" % (sixth_variable,)
+                                        }
+
+                                        dictionary_2 = copy.deepcopy(dictionary_1)
+                                        dictionary_2['statement_list_2'].append(fifth_variable)
+
+                                        template_list_3.append(dictionary_1)
+                                        template_list_3.append(dictionary_2)
+
+
+                                        extraneous_var_list_1 = ['pp7', '~pp7', 'pp8', '~pp8', 'pp9', '~pp9']
+                                        extraneous_var_list_2 = ['pp8', '~pp8']
+                                        extraneous_var_list_3 = ['pp9', '~pp9']
+
+                                        extraneous_operator_list = ['==>', '<=>', '&', '|', '^']
+
+                                        extraneous_var_1 = extraneous_var_list_1[np.random.randint(len(extraneous_var_list_1))]
+                                        extraneous_var_2 = extraneous_var_list_2[np.random.randint(len(extraneous_var_list_2))]
+                                        extraneous_var_3 = extraneous_var_list_3[np.random.randint(len(extraneous_var_list_3))]
+                                        extraneous_operator = extraneous_operator_list[np.random.randint(len(extraneous_operator_list))]
+
+                                        extraneous_statement = "%s %s %s" % (extraneous_var_2, extraneous_operator, extraneous_var_3)
+
+                                        dictionary_3 = copy.deepcopy(dictionary_1)
+                                        dictionary_4 = copy.deepcopy(dictionary_2)
+
+                                        dictionary_3['statement_list_2'].append(extraneous_var_1)
+                                        dictionary_3['statement_list_2'].append(extraneous_statement)
+
+                                        dictionary_4['statement_list_2'].append(extraneous_var_1)
+                                        dictionary_4['statement_list_2'].append(extraneous_statement)
+
+                                        template_list_3.append(dictionary_3)
+                                        template_list_3.append(dictionary_4)
+
+    # End loop for three-stage if-then
+
+    template_dictionary = {
+        'template_list_0' : template_list_0,
+        'template_list_1' : template_list_1,
+        'template_list_2' : template_list_2,
+        'template_list_3' : template_list_3
+    }
+
+    return template_dictionary
+
+# End two_agent_template_list
+
+
 #### MAIN CODE BELOW FOR GENERTING PROBLEM SETS
+
+#### TODO AS OF 29 AUGUST 2022: We must copy make_problem_tsv_file, which is based on
+#### basic_template_list, and create a new function make_problem_two_agent_tsv_file.
+#### This function will work with the output of two_agent_template list in a way that is
+#### analogous to how make_problem_tsv_file works.  This is because we must gather test
+#### statistics for two agent cooperation for various types of problems, including
+#### problems the agent solves on its own, problems where things are found to be contradictory,
+#### and problems where the agent asks for help in order to learn whether the answer is
+#### True, False, not enough information, or contradictory.  We must get accuracy statistics
+#### for those cases, and especially those cases where the agent must demonstrate that it
+#### knows its knowledge is insufficient or contradictory, to demonstrate the core of
+#### self-awareness as we have defined it.  The paper would have to contain a table
+#### describing these problems and the overall accuracy solving these problems.  Also
+#### show accuracy when the agent is able to determine True, False, or contradictory
+#### on its own without a second agent.
 
 def make_problem_tsv_file(filename):
 
