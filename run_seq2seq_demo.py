@@ -176,8 +176,8 @@ class nn_entity:
 
 # End class declaration for nn_entity
 
-def run_dual_agent_demo(agent_1_initial_knowledge_list = ['~A'],
-                        agent_2_initial_knowledge_list = ['C ==> A'],
+def run_dual_agent_demo(agent_1_initial_knowledge_list = ['~A', 'C ==> B'],
+                        agent_2_initial_knowledge_list = ['B ==> A'],
                         question_for_agent_1 = 'What is C ?'):
 
   # Test code for the entity below.
@@ -245,4 +245,4 @@ def run_dual_agent_demo(agent_1_initial_knowledge_list = ['~A'],
   # End logic for handling possible help request
 # End function run_dual_agent_demo
 
-#run_dual_agent_demo()
+run_dual_agent_demo()
