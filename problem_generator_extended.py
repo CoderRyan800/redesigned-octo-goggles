@@ -785,12 +785,16 @@ def make_problem_tsv_file(filename):
 
         if random_number < 0.250:
             long_template_list = long_template_dictionary['template_list_0']
+            complexity_level = 0
         elif random_number < 0.500:
             long_template_list = long_template_dictionary['template_list_1']
+            complexity_level = 1
         elif random_number < 0.750:
             long_template_list = long_template_dictionary['template_list_2']
+            complexity_level = 2
         else:
             long_template_list = long_template_dictionary['template_list_3']
+            complexity_level = 3
 
         num_templates = len(long_template_list)
 
@@ -802,7 +806,12 @@ def make_problem_tsv_file(filename):
             problem_instance = generate_problem_from_template(current_template)
             problem_answer = problem_instance['answer']
             attempt_index = attempt_index + 1
-        # End loop to keep selecting randomly until we get what we need.
+        # End loop to keep selecting randomly until we get what we need.e
+
+        if attempt_index == 50:
+            print("WARNING: ATTEMPT INDEX IS 50!\n")
+            print("Target answer = %s and problem answer = %s\n" % (answer_target,problem_answer))
+            print("Complexity level = %d\n" % (complexity_level,))
 
         result_list.append(current_template)
 
@@ -881,7 +890,7 @@ def make_problem_tsv_file(filename):
 list_of_files = []
 
 #for index in range(50,200):
-for index in range(10,250):
+for index in range(1,250):
     list_of_files.append('logic_data_extended_%02d.tsv' % (index,))
 
 for filename in list_of_files:

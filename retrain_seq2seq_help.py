@@ -50,7 +50,8 @@ import time
 import pickle
 from keras.models import Model, load_model
 from keras.layers import Input, LSTM, Dense, Bidirectional
-from keras.layers.merge import Concatenate
+#from keras.layers.merge import Concatenate
+from keras.layers import Concatenate
 from keras import backend as K
 import numpy as np
 
@@ -334,7 +335,7 @@ for current_epoch in range(0,epochs):
     fp.close()
     fp = open('training_log.txt','a')
     fp.write("Loss history:\n%s\n" % (str(loss_history),))
-    fp.write("End of epoch\n")
+    fp.write("End of epoch %d\n" % (current_epoch,))
     fp.close()
 
 # End epoch loop
