@@ -245,4 +245,4 @@ def run_dual_agent_demo(agent_1_initial_knowledge_list = ['~A', 'C ==> B'],
   # End logic for handling possible help request
 # End function run_dual_agent_demo
 
-run_dual_agent_demo()
+#run_dual_agent_demo()
