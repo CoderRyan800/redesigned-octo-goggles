@@ -790,6 +790,70 @@ def two_agent_template_list():
             "statement_list_2": [],
             "question": "~pp1"
         },
+        # Also, if current agent knows nothing or knows something irrelevant,
+        # it needs to ask.
+        {
+            "statement_list_1": [],
+            "statement_list_2": ["pp1"],
+            "question": "pp1"
+        },
+        {
+            "statement_list_1": [],
+            "statement_list_2": ["pp1"],
+            "question": "~pp1"
+        },
+        {
+            "statement_list_1": [],
+            "statement_list_2": ["~pp1"],
+            "question": "pp1"
+        },
+        {
+            "statement_list_1": ["pp2"],
+            "statement_list_2": ["~pp1"],
+            "question": "~pp1"
+        },
+
+        {
+            "statement_list_1": ["pp2"],
+            "statement_list_2": ["pp1"],
+            "question": "pp1"
+        },
+        {
+            "statement_list_1": ["pp2"],
+            "statement_list_2": ["pp1"],
+            "question": "~pp1"
+        },
+        {
+            "statement_list_1": ["pp2"],
+            "statement_list_2": ["~pp1"],
+            "question": "pp1"
+        },
+        {
+            "statement_list_1": ["pp2"],
+            "statement_list_2": ["~pp1"],
+            "question": "~pp1"
+        },
+
+        {
+            "statement_list_1": ["~pp2"],
+            "statement_list_2": ["pp1"],
+            "question": "pp1"
+        },
+        {
+            "statement_list_1": ["~pp2"],
+            "statement_list_2": ["pp1"],
+            "question": "~pp1"
+        },
+        {
+            "statement_list_1": ["~pp2"],
+            "statement_list_2": ["~pp1"],
+            "question": "pp1"
+        },
+        {
+            "statement_list_1": ["~pp2"],
+            "statement_list_2": ["~pp1"],
+            "question": "~pp1"
+        },
 
         # Core common sense - if you're given an answer for an irrelevant variable
         # then you can't answer!
@@ -814,6 +878,50 @@ def two_agent_template_list():
             "statement_list_2": [],
             "question": "pp3"
         }
+
+
+        {
+            "statement_list_1": ["~pp1"],
+            "statement_list_2": ["~pp2"],
+            "question": "pp3"
+        },
+        {
+            "statement_list_1": ["~pp1"],
+            "statement_list_2": ["~pp2"],
+            "question": "~pp3"
+        },
+        {
+            "statement_list_1": ["pp1"],
+            "statement_list_2": ["~pp2"],
+            "question": "~pp3"
+        },
+        {
+            "statement_list_1": ["pp1"],
+            "statement_list_2": ["~pp2"],
+            "question": "pp3"
+        }
+
+        {
+            "statement_list_1": ["~pp1"],
+            "statement_list_2": ["pp2"],
+            "question": "pp3"
+        },
+        {
+            "statement_list_1": ["~pp1"],
+            "statement_list_2": ["pp2"],
+            "question": "~pp3"
+        },
+        {
+            "statement_list_1": ["pp1"],
+            "statement_list_2": ["pp2"],
+            "question": "~pp3"
+        },
+        {
+            "statement_list_1": ["pp1"],
+            "statement_list_2": ["pp2"],
+            "question": "pp3"
+        }
+
     ]
 
     # Next, create very simple if-then problems.
