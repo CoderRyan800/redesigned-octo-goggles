@@ -419,6 +419,98 @@ def generate_problem_from_template(input_template, n_vars=10, max_reps=3):
 
 # End function generate_problem_from_template
 
+
+def generate_problem_from_two_agent_template(input_template, n_vars=10, max_reps=3):
+
+    """
+    generate_problem_from_two_agent_template: Given an input template perform these steps:
+
+    1. Create a substitution dictionary and replace the placeholders with real
+    entities in the sentences and in the question.
+    2. Then instantiate the sentences with repetitions.
+    3. Then run the logic problem solver to obtain the answer.
+    4. Set the contradiction flag.  Initially we will not try to train the
+    networks with contradictions because we think this will be overly complex,
+    although a contradictions means the answer to all queries is always True.
+
+    :param input_template: A dictionary:
+        "statement_list_1": with a value that is a list of prototype statements
+            using placeholders
+        "statement_list_2": list of statements for second agent
+        "question": A query to give to the system.  This will be turned into
+        a "what is ?" query so that the LSTM will learn the difference between
+        a question and a statement.
+    :param n_vars: Max number of variables, propositions, names, etc.
+    See permutation generator for details.
+    :param max_reps: Maximum times a given sentence can be repeated in a problem instance.
+    :return: A problem dictionary that can be converted into neural net training data.
+    """
+
+    proto_statement_list_1 = input_template["statement_list_1"]
+    proto_statement_list_2 = input_template["statement_list_2"]
+    proto_question = input_template["question"]
+
+    # Step 1: Create a permutation dictionary and instantiate the placeholders with
+    # actual expressions.
+
+    permutation_dictionary = permutation_generator(n_vars)
+
+    statement_list_1 = []
+    statement_list_2 = []
+
+    for proto_statement in proto_statement_list_1:
+
+        statement_list_1.append(instantiate_placeholders(permutation_dictionary,
+                                                       proto_statement))
+
+    for proto_statement in proto_statement_list_2:
+
+        statement_list_2.append(instantiate_placeholders(permutation_dictionary,
+                                                       proto_statement))
+
+    question = instantiate_placeholders(permutation_dictionary,
+                                        proto_question)
+
+    # Step 2: Generate a dictionary that has the statements randomly ordered
+    # and randomly repeated.  This dictionary also has an ordered statement list
+    # where each statement appears in the same order but is given exactly once.
+
+    initial_template = {
+        'statement_list': statement_list_1
+    }
+
+    repetition_template = create_problem_with_repetition(initial_template, max_reps)
+
+    # Step 3: Create a simple template using the non-repeated statement list.
+
+    simple_problem = make_simple_template(repetition_template['sentence_list'], question)
+
+    simple_problem['sentence_list_with_repetition'] = repetition_template['sentence_list_with_repetition']
+
+    # Do again for second statement list.
+
+
+    initial_template = {
+        'statement_list': statement_list_2
+    }
+
+
+    repetition_template = create_problem_with_repetition(initial_template, max_reps)
+
+    simple_problem_2 = make_simple_template(repetition_template['sentence_list'], question)
+
+    simple_problem_2['sentence_list_with_repetition'] = repetition_template['sentence_list_with_repetition']
+
+    simple_problem['sentence_list_2'] = simple_problem_2['sentence_list']
+    simple_problem['sentence_list_with_repetition_2'] = simple_problem_2['sentence_list_with_repetition']
+
+
+    return simple_problem
+
+# End function generate_problem_from_two_agent_template
+
+
+
 def combine_sentence_list(sentence_list):
 
     """
@@ -877,7 +969,7 @@ def two_agent_template_list():
             "statement_list_1": ["pp1"],
             "statement_list_2": [],
             "question": "pp3"
-        }
+        },
 
 
         {
@@ -899,7 +991,7 @@ def two_agent_template_list():
             "statement_list_1": ["pp1"],
             "statement_list_2": ["~pp2"],
             "question": "pp3"
-        }
+        },
 
         {
             "statement_list_1": ["~pp1"],
