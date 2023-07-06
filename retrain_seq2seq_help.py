@@ -50,7 +50,7 @@ import time
 import pickle
 from keras.models import Model, load_model
 from keras.layers import Input, LSTM, Dense, Bidirectional
-from keras.layers.merge import Concatenate
+from keras.layers import Concatenate
 from keras import backend as K
 import numpy as np
 
@@ -315,7 +315,7 @@ num_training_sets = len(list_of_training_files)
 
 epochs = 3072
 
-for current_epoch in range(1548,epochs):
+for current_epoch in range(1001,epochs):
     fp = open('training_log.txt','a')
     fp.write("STARTING EPOCH %d\n" % (current_epoch,))
     fp.close()

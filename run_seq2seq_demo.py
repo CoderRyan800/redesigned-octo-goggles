@@ -3,7 +3,7 @@ import pickle
 import re
 from keras.models import Model, load_model
 from keras.layers import Input
-from keras.layers.merge import Concatenate
+from keras.layers import Concatenate
 import numpy as np
 import traceback
 from logic import *
@@ -18,7 +18,7 @@ num_samples = 50000  # Number of samples to train on.
 # Path to the data txt file on disk.  Changed from original (commented out) code.
 #data_path = 'fra-eng/fra.txt'
 #data_path = 'fra.txt'
-data_path = 'logic_data_extended.tsv'
+data_path = 'logic_data_extended_00.tsv'
 # Vectorize the data.
 input_texts = []
 target_texts = []
@@ -419,3 +419,5 @@ def run_dual_agent_demo(agent_1_initial_knowledge_list = ['~A'],
 
   # End logic for handling possible help request
 # End function run_dual_agent_demo
+
+run_dual_agent_demo()

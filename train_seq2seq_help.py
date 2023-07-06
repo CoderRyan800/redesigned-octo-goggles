@@ -49,7 +49,7 @@ from __future__ import print_function
 
 from keras.models import Model
 from keras.layers import Input, LSTM, Dense, Bidirectional
-from keras.layers.merge import Concatenate
+from keras.layers import Concatenate
 import numpy as np
 import pickle
 
