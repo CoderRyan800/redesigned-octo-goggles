@@ -35,7 +35,8 @@ for line in lines[: min(num_samples, len(lines) - 1)]:
     input_text = line_array[0]
     target_text = line_array[3]
     if line_index < 20:
-        print("input_text=%s\ntarget_text=%s\n" % (input_text, target_text))
+        #print("input_text=%s\ntarget_text=%s\n" % (input_text, target_text))
+        pass
     line_index = line_index+1
     # We use "tab" as the "start sequence" character
     # for the targets, and "\n" as "end sequence" character.
