@@ -1,0 +1,71 @@
+\begin{thebibliography}{10}
+
+\bibitem{tensorflow2015-whitepaper}
+Mart\'{\i}n Abadi, Ashish Agarwal, Paul Barham, Eugene Brevdo, Zhifeng Chen,
+  Craig Citro, Greg~S. Corrado, Andy Davis, Jeffrey Dean, Matthieu Devin,
+  Sanjay Ghemawat, Ian Goodfellow, Andrew Harp, Geoffrey Irving, Michael Isard,
+  Yangqing Jia, Rafal Jozefowicz, Lukasz Kaiser, Manjunath Kudlur, Josh
+  Levenberg, Dandelion Man\'{e}, Rajat Monga, Sherry Moore, Derek Murray, Chris
+  Olah, Mike Schuster, Jonathon Shlens, Benoit Steiner, Ilya Sutskever, Kunal
+  Talwar, Paul Tucker, Vincent Vanhoucke, Vijay Vasudevan, Fernanda Vi\'{e}gas,
+  Oriol Vinyals, Pete Warden, Martin Wattenberg, Martin Wicke, Yuan Yu, and
+  Xiaoqiang Zheng.
+\newblock {TensorFlow}: Large-scale machine learning on heterogeneous systems,
+  2015.
+\newblock Software available from tensorflow.org.
+
+\bibitem{DBLP:journals/corr/abs-1711-03902}
+Tarek~R. Besold, Artur~S. d'Avila Garcez, Sebastian Bader, Howard Bowman,
+  Pedro~M. Domingos, Pascal Hitzler, Kai{-}Uwe K{\"{u}}hnberger, Lu{\'{\i}}s~C.
+  Lamb, Daniel Lowd, Priscila Machado~Vieira Lima, Leo de~Penning, Gadi Pinkas,
+  Hoifung Poon, and Gerson Zaverucha.
+\newblock Neural-symbolic learning and reasoning: {A} survey and
+  interpretation.
+\newblock {\em CoRR}, abs/1711.03902, 2017.
+
+\bibitem{bica2015_integrated_neural_symbolic}
+Tarek~R. Besold and Kai-Uwe K\"{u}nberger.
+\newblock Towards integrated neural-symbolic systems for human-level ai: Two
+  research programs helping to bridge the gaps.
+\newblock {\em Biologically Inspired Cognitive Architectures}, 14:97--110,
+  2015.
+
+\bibitem{chollet2015keras}
+Fran\c{c}ois Chollet et~al.
+\newblock Keras.
+\newblock https://keras.io, 2015.
+
+\bibitem{9045930}
+B.~Z. {Du}, Q.~{Guo}, Y.~{Zhao}, T.~{Zhi}, Y.~{Chen}, and Z.~{Xu}.
+\newblock Self-aware neural network systems: A survey and new perspective.
+\newblock {\em Proceedings of the IEEE}, 108(7):1047--1067, 2020.
+
+\bibitem{DBLP:journals/corr/abs-1802-08535}
+Richard Evans, David Saxton, David Amos, Pushmeet Kohli, and Edward
+  Grefenstette.
+\newblock Can neural networks understand logical entailment?
+\newblock {\em CoRR}, abs/1802.08535, 2018.
+
+\bibitem{neural_symbolic_2007}
+Barbara Hammer and Pascal Hitzler, editors.
+\newblock {\em Perspectives of Neural-Symbolic Integration}.
+\newblock Springer-Verlag, Berlin Heidelberg, 2007.
+
+\bibitem{captcha_2017}
+Qiuyuan Huang, Paul Smolensky, Xiaodong He, Li~Deng, and Dapeng Wu.
+\newblock A neural-symbolic approach to design of captcha.
+\newblock {\em arXiv}, 2017.
+\newblock arXiv:1710.11475v2 [cs.CL].
+
+\bibitem{aima_repo}
+Stuart Russell and Peter Norvig.
+\newblock aima-python.
+\newblock \url{https://github.com/aimacode/aima-python}, 2019.
+
+\bibitem{aima_3rd_ed}
+Stuart~J. Russell and Peter Norvig.
+\newblock {\em Artificial Intelligence - {A} Modern Approach {(3.} internat.
+  ed.)}.
+\newblock Pearson Education, 2010.
+
+\end{thebibliography}
